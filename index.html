@@ -1,0 +1,3031 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Helpdesk System - Pro Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-bg: #0f172a;
+            --sidebar-hover: #1e293b;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --pane-bg: #f8fafc;
+            --glow-color: rgba(99, 102, 241, 0.4);
+            --ticket-card-bg: #ffffff;
+            --ticket-card-hover: #f8fafc;
+        }
+
+        body.dark-mode {
+            --sidebar-bg: #0b0f19;
+            --sidebar-hover: #1e293b;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #030712;
+            --card: #111827;
+            --text: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border: #1f2937;
+            --pane-bg: #0d1322;
+            --glow-color: rgba(99, 102, 241, 0.6);
+            --ticket-card-bg: #1f2937;
+            --ticket-card-hover: #2d3748;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; transition: background 0.3s ease, color 0.3s ease; }
+        
+        #announcementBanner { 
+            background: linear-gradient(135deg, #334155, #1e293b); 
+            color: #fff; 
+            padding: 10px 20px; 
+            font-size: 0.9rem; 
+            font-weight: 500; 
+            display: none; 
+            align-items: center; 
+            justify-content: space-between; 
+            gap: 15px; 
+            z-index: 1050; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
+            width: 100%; 
+            flex-shrink: 0;
+            animation: slideDown 0.4s ease-out;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        #announcementText { flex: 1; word-break: break-word; }
+        .announcement-close { background: rgba(239, 68, 68, 0.9); border: none; color: #fff; padding: 5px 12px; border-radius: 6px; cursor: pointer; display: none; align-items: center; gap: 6px; font-size: 0.80rem; font-weight: 600; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; }
+        .announcement-close:hover { background: #dc2626; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
+
+        .topbar { background: var(--sidebar-bg); color: #fff; height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 1px solid var(--border); flex-shrink: 0; gap: 10px; }
+        .topbar-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .topbar-logo { background: var(--primary); color: #fff; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4); transition: transform 0.3s ease; }
+        .topbar-logo:hover { transform: rotate(15deg) scale(1.08); }
+        .topbar-title { font-size: 1.0rem; font-weight: 600; white-space: nowrap; }
+        
+        .topbar-search { 
+            background: rgba(255, 255, 255, 0.08); 
+            border: 1px solid rgba(255, 255, 255, 0.12); 
+            border-radius: 8px; 
+            padding: 5px 10px; 
+            color: #fff; 
+            width: 200px; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            transition: all 0.3s ease;
+        }
+        .topbar-search:hover, .topbar-search:focus-within {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary);
+            box-shadow: 0 0 12px var(--glow-color);
+            width: 240px;
+        }
+        .topbar-search input { background: transparent; border: none; outline: none; color: #fff; width: 100%; font-size: 0.85rem; }
+        .topbar-search input::placeholder { color: #94a3b8; }
+        .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        
+        .btn-create { 
+            background: var(--primary); 
+            color: #fff; 
+            border: none; 
+            padding: 7px 12px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            font-size: 0.8rem; 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-create:hover { 
+            background: var(--primary-hover); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px var(--glow-color);
+        }
+        .btn-create:active { transform: translateY(0); }
+
+        .btn-announcement { background: #334155; color: #fff; border: none; padding: 7px 10px; border-radius: 8px; font-weight: 600; cursor: pointer; display: none; align-items: center; gap: 6px; font-size: 0.8rem; transition: all 0.2s ease; }
+        .btn-announcement:hover { background: #1e293b; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+        .btn-icon { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); color: #fff; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.25s ease; flex-shrink: 0; }
+        .btn-icon:hover { background: var(--primary); transform: scale(1.08) rotate(5deg); box-shadow: 0 4px 12px var(--glow-color); }
+
+        .sound-selector { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); color: #fff; padding: 5px 8px; border-radius: 8px; font-size: 0.75rem; outline: none; cursor: pointer; transition: all 0.2s ease; }
+        .sound-selector:hover { background: rgba(255, 255, 255, 0.15); border-color: var(--primary); }
+        .sound-selector option { background: var(--sidebar-bg); color: #fff; }
+
+        .btn-logout-text { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 7px 10px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.8rem; transition: all 0.25s ease; white-space: nowrap; }
+        .btn-logout-text:hover { background: #dc2626; color: #fff; border-color: #dc2626; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
+
+        #dashboardSection { display: none; height: 100vh; flex-direction: column; overflow: hidden; }
+        .app-container { display: flex; flex: 1; overflow: hidden; position: relative; min-height: 0; }
+
+        .sidebar { width: 220px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 15px 10px; gap: 6px; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease; overflow: hidden; flex-shrink: 0; height: 100%; }
+        .sidebar.minimized { width: 60px; padding: 15px 6px; }
+        .sidebar.minimized .sidebar-item span, 
+        .sidebar.minimized .sidebar-category, 
+        .sidebar.minimized .badge-count { opacity: 0; pointer-events: none; width: 0; overflow: hidden; }
+        .sidebar.minimized .sidebar-item { justify-content: center; }
+
+        .sidebar-category { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: bold; padding: 10px 10px 5px; letter-spacing: 0.5px; white-space: nowrap; transition: opacity 0.2s; }
+        
+        .sidebar-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; color: var(--text-muted); border-radius: 8px; cursor: pointer; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.25s ease; white-space: nowrap; position: relative; }
+        .sidebar-item:hover, .sidebar-item.active { background: var(--sidebar-hover); color: #fff; transform: translateX(3px); }
+        .sidebar-item.active::before { content:''; position: absolute; left: 0; top: 15%; height: 70%; width: 3px; background: var(--primary); border-radius: 0 4px 4px 0; box-shadow: 0 0 8px var(--primary); }
+        .sidebar-item i { width: 20px; text-align: center; flex-shrink: 0; transition: transform 0.2s ease; }
+        .sidebar-item:hover i { transform: scale(1.2); color: var(--primary); }
+        .sidebar-item span { transition: opacity 0.2s; }
+        .badge-count { background: var(--primary); color: #fff; padding: 2px 7px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; transition: all 0.2s; }
+        .sidebar-item:hover .badge-count { transform: scale(1.1); }
+
+        .main-content { flex: 1; display: flex; background: var(--card); overflow: hidden; height: 100%; min-width: 0; position: relative; }
+        
+        .ticket-pane { width: 340px; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--pane-bg); transition: width 0.3s ease; overflow: hidden; flex-shrink: 0; height: 100%; }
+        .pane-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; flex-shrink: 0; }
+        
+        .ticket-scroll-list { overflow-y: auto; flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+        
+        #adminTicketList {
+            flex: 1;
+            min-height: 250px;
+            max-height: 580px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 8px 4px 12px 0;
+        }
+
+        .ticket-item { 
+            padding: 16px 18px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            background: var(--ticket-card-bg); 
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); 
+            position: relative;
+            overflow: hidden;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 100px;
+            flex-shrink: 0;
+        }
+
+        .ticket-item:hover { 
+            background: var(--ticket-card-hover); 
+            border-color: var(--primary); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .ticket-item.active { 
+            border-left: 5px solid var(--primary); 
+            background: var(--ticket-card-hover); 
+            box-shadow: 0 6px 16px var(--glow-color); 
+        }
+
+        .ticket-item-title { 
+            font-size: 0.95rem; 
+            font-weight: 700; 
+            color: var(--text); 
+            line-height: 1.4;
+            white-space: normal;
+            word-break: break-word;
+            margin: 0;
+        }
+
+        .ticket-item-snippet { 
+            font-size: 0.85rem; 
+            color: var(--text-muted); 
+            line-height: 1.4;
+            display: -webkit-box; 
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            margin: 0;
+        }
+
+        .ticket-item-meta { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 0.78rem; 
+            color: var(--text-muted); 
+            font-weight: 500; 
+            margin-top: 4px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .workspace-pane { flex: 1; display: flex; flex-direction: column; background: var(--card); overflow: hidden; height: 100%; min-width: 0; position: relative; }
+        .workspace-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; flex-shrink: 0; background: var(--card); }
+        .workspace-title h2 { font-size: 1.1rem; color: var(--text); margin-bottom: 4px; }
+        .workspace-sub { font-size: 0.78rem; color: var(--text-muted); display: flex; gap: 12px; flex-wrap: wrap; }
+
+        .chat-container { 
+            padding: 20px 24px; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px; 
+            overflow-y: auto; 
+            background-color: var(--bg); 
+            background-image: radial-gradient(var(--border) 1px, transparent 0);
+            background-size: 18px 18px;
+            min-height: 0; 
+        }
+        
+        .chat-card { 
+            border-radius: 16px; 
+            padding: 12px 16px; 
+            max-width: 75%; 
+            position: relative;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important;
+        }
+
+        .chat-card.incoming-msg { 
+            align-self: flex-start; 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            color: var(--text);
+        }
+        .chat-card.incoming-msg .chat-card-header { 
+            color: var(--primary); 
+            font-weight: 700;
+        }
+
+        .chat-card.outgoing-msg { 
+            align-self: flex-end; 
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); 
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+            color: #ffffff !important;
+        }
+        .chat-card.outgoing-msg .chat-card-header { 
+            color: #c7d2fe !important; 
+            font-weight: 600;
+        }
+        .chat-card.outgoing-msg .chat-card-body { 
+            color: #ffffff !important; 
+        }
+
+        .chat-card.auto-reply-msg { 
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important; 
+            border: 1px solid #f59e0b !important; 
+            box-shadow: 0 6px 18px rgba(245, 158, 11, 0.15) !important;
+        }
+        .chat-card.auto-reply-msg .chat-card-header { 
+            color: #b45309 !important; 
+            font-weight: 800; 
+            letter-spacing: 0.3px;
+        }
+        .chat-card.auto-reply-msg .chat-card-body { 
+            color: #78350f !important; 
+            font-weight: 600; 
+        }
+
+        body.dark-mode .chat-card.auto-reply-msg {
+            background: linear-gradient(135deg, #1e1b18 0%, #362003 100%) !important;
+            border: 1px solid #d97706 !important;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5) !important;
+        }
+        body.dark-mode .chat-card.auto-reply-msg .chat-card-header { 
+            color: #fbbf24 !important; 
+        }
+        body.dark-mode .chat-card.auto-reply-msg .chat-card-body { 
+            color: #fef08a !important; 
+        }
+
+        .chat-card.auto-reply-msg.align-left { 
+            align-self: flex-start; 
+            border-bottom-left-radius: 4px; 
+        }
+        .chat-card.auto-reply-msg.align-right { 
+            align-self: flex-end; 
+            border-bottom-right-radius: 4px; 
+        }
+
+        .chat-card-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            font-size: 0.72rem; 
+            margin-bottom: 6px; 
+            gap: 15px; 
+        }
+        .chat-card-body { 
+            font-size: 0.88rem; 
+            line-height: 1.5; 
+            word-break: break-word; 
+        }
+
+        .audit-trail-box { background: var(--pane-bg); border-top: 1px solid var(--border); padding: 8px 20px; font-size: 0.7rem; color: var(--text-muted); max-height: 50px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+        .typing-indicator { font-size: 0.7rem; color: var(--primary); font-style: italic; padding: 6px 20px; background: var(--pane-bg); display: none; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+        .reply-box { 
+            padding: 12px 18px; 
+            border-top: 1px solid var(--border); 
+            background: var(--card); 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            flex-shrink: 0; 
+            position: relative; 
+        }
+        .reply-input { 
+            flex: 1; 
+            border: 1px solid var(--border); 
+            border-radius: 20px; 
+            padding: 10px 16px; 
+            outline: none; 
+            font-size: 0.88rem; 
+            background: var(--pane-bg); 
+            color: var(--text); 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reply-input:hover {
+            border-color: var(--primary);
+            background: var(--card);
+        }
+        .reply-input:focus { 
+            border-color: var(--primary); 
+            background: var(--card);
+            box-shadow: 0 0 0 4px var(--glow-color);
+        }
+
+        .admin-dashboard-container { flex: 1; display: flex; flex-direction: column; background: var(--bg); overflow-y: auto; padding: 20px; gap: 15px; height: 100%; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        
+        .stat-card { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            padding: 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02); 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            border-color: var(--primary);
+        }
+        .stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover .stat-icon {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        .admin-content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; }
+        
+        .admin-box { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            padding: 18px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02); 
+            display: flex; 
+            flex-direction: column; 
+            transition: all 0.3s ease;
+        }
+        .admin-box:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+        }
+        .admin-box h3 { font-size: 0.95rem; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+
+        .admin-control-panel { width: 280px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.02); }
+        .admin-control-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--pane-bg); }
+        .admin-control-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; flex: 1; }
+        
+        .modern-control-group { display: flex; flex-direction: column; gap: 5px; }
+        .modern-control-group label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .modern-select { 
+            appearance: none; 
+            background: var(--pane-bg) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") no-repeat right 10px center; 
+            background-size: 12px; 
+            padding: 8px 12px; 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            font-size: 0.8rem; 
+            color: var(--text); 
+            outline: none; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.25s ease;
+        }
+        .modern-select:hover, .modern-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--glow-color);
+        }
+
+        .modern-info-card { background: var(--pane-bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; font-size: 0.75rem; }
+        .modern-info-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border); padding-bottom: 5px; }
+        .modern-info-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .modern-info-label { color: var(--text-muted); font-weight: 500; }
+        .modern-info-val { color: var(--text); font-weight: 600; text-align: right; }
+
+        #emojiPickerPopup { display: none; position: absolute; bottom: 65px; left: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px; width: 260px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); z-index: 100; grid-template-columns: repeat(6, 1fr); gap: 6px; text-align: center; animation: popIn 0.2s cubic-bezier(0.4,0,0.2,1); }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        #emojiPickerPopup.show { display: grid; }
+        .emoji-item { font-size: 1.2rem; cursor: pointer; padding: 4px; border-radius: 6px; transition: transform 0.2s; }
+        .emoji-item:hover { background: var(--pane-bg); transform: scale(1.3); }
+
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-open { background: rgba(220, 38, 38, 0.18); color: #ef4444; }
+        .status-proses { background: rgba(217, 119, 6, 0.18); color: #f59e0b; }
+        .status-selesai { background: rgba(22, 163, 74, 0.18); color: #22c55e; }
+
+        .online-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+        .online-dot.is-online { background-color: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.8); animation: pulseDot 2s infinite; }
+        @keyframes pulseDot {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .online-dot.is-offline { background-color: #94a3b8; }
+
+        .file-dropzone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 14px 10px;
+            text-align: center;
+            background: var(--pane-bg);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 95px;
+        }
+
+        .file-dropzone:hover, .file-dropzone.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.08);
+            box-shadow: 0 0 15px var(--glow-color);
+            transform: translateY(-2px);
+        }
+
+        .file-dropzone.dragover {
+            border-style: solid;
+            animation: pulseBorder 1.2s infinite ease-in-out;
+        }
+
+        @keyframes pulseBorder {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+
+        .file-dropzone i.drop-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .file-dropzone:hover i.drop-icon {
+            transform: translateY(-4px) scale(1.15);
+        }
+
+        .file-drop-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .file-drop-text span {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .thumb-preview-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 6px;
+            width: 100%;
+        }
+
+        .thumb-preview-card {
+            position: relative;
+            width: 52px;
+            height: 52px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .thumb-preview-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumb-remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(220, 38, 38, 0.9);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 0.55rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .thumb-remove-btn:hover { transform: scale(1.2); background: #dc2626; }
+
+        #loginSection {
+            width: 100vw;
+            height: 100vh;
+            background: #070b14;
+            display: flex;
+            flex-direction: column;
+            color: #f3f4f6;
+            overflow-y: auto;
+        }
+
+        .portal-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .portal-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .portal-brand-logo {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: #fff;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+            transition: transform 0.3s ease;
+        }
+        .portal-brand:hover .portal-brand-logo {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .portal-brand-text h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        .portal-brand-text p {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .btn-wa-support {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #10b981;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-wa-support:hover {
+            background: #10b981;
+            color: #ffffff;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .portal-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 20px;
+            gap: 60px;
+        }
+
+        .portal-hero {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .hero-badge {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            transition: border-color 0.3s;
+        }
+        .hero-badge:hover {
+            border-color: #6366f1;
+        }
+
+        .portal-clock-badge {
+            align-self: flex-start;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+        .portal-clock-badge:hover {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: #ffffff;
+            letter-spacing: -1px;
+        }
+
+        .hero-desc {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+
+        .hero-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .feature-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+            background: rgba(15, 23, 42, 0.85);
+        }
+
+        .feature-icon {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover .feature-icon {
+            transform: scale(1.2);
+        }
+
+        .feature-card h4 {
+            font-size: 0.85rem;
+            color: #f8fafc;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            font-size: 0.72rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .portal-card-wrapper {
+            flex: 0.9;
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .portal-card {
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 0 50px rgba(99, 102, 241, 0.12);
+            position: relative;
+            transition: box-shadow 0.4s ease, border-color 0.4s ease;
+        }
+        .portal-card:hover {
+            box-shadow: 0 0 65px rgba(99, 102, 241, 0.25);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .portal-card-header {
+            margin-bottom: 24px;
+        }
+
+        .portal-card-header h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .portal-card-header p {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .portal-input-group {
+            margin-bottom: 18px;
+        }
+
+        .portal-input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .portal-input-group label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #cbd5e1;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: color 0.2s ease;
+        }
+
+        .portal-input-field {
+            position: relative;
+            display: flex;
+            align-items: center;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .portal-input-field:hover {
+            transform: translateY(-2px);
+        }
+
+        .portal-input-field i.left-icon {
+            position: absolute;
+            left: 14px;
+            color: #64748b;
+            font-size: 0.9rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        }
+
+        .portal-input-field input {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            outline: none;
+            color: #ffffff;
+            font-size: 0.88rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .portal-input-field input:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+            background: rgba(30, 41, 59, 0.8);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .portal-input-field input:focus {
+            border-color: #6366f1;
+            background: rgba(30, 41, 59, 0.95);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25), 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .portal-input-field:focus-within i.left-icon,
+        .portal-input-field:hover i.left-icon {
+            color: #818cf8;
+            transform: scale(1.1);
+        }
+
+        .portal-input-group:focus-within label {
+            color: #818cf8;
+        }
+
+        .btn-portal-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.35);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-portal-submit:hover {
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-portal-submit:active {
+            transform: translateY(0);
+        }
+
+        .portal-divider {
+            text-align: center;
+            margin: 22px 0;
+            font-size: 0.75rem;
+            color: #64748b;
+            position: relative;
+        }
+
+        .register-options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-portal-register {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+
+        .btn-portal-register:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .btn-portal-register-wa {
+            background: rgba(16, 185, 129, 0.08);
+            border-color: rgba(16, 185, 129, 0.25);
+            color: #34d399;
+        }
+
+        .btn-portal-register-wa:hover {
+            background: rgba(16, 185, 129, 0.18);
+            border-color: rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .portal-footer {
+            padding: 16px 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+            color: #64748b;
+        }
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .password-wrapper input {
+            padding-right: 38px;
+        }
+        .password-toggle-icon {
+            position: absolute;
+            right: 12px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            user-select: none;
+            transition: all 0.2s ease;
+            padding: 4px;
+        }
+        .password-toggle-icon:hover {
+            color: var(--primary);
+            transform: scale(1.15);
+        }
+
+        .modal-overlay {
+            display:none; 
+            position:fixed; 
+            top:0; 
+            left:0; 
+            width:100%; 
+            height:100%; 
+            background:rgba(0,0,0,0.65); 
+            backdrop-filter: blur(4px);
+            z-index:1200; 
+            align-items:center; 
+            justify-content:center; 
+            padding:15px;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .modal-card {
+            background:var(--card); 
+            width:100%; 
+            padding:25px; 
+            border-radius:14px; 
+            border:1px solid var(--border); 
+            box-shadow:0 20px 40px rgba(0,0,0,0.3);
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        table tbody tr {
+            transition: all 0.2s ease;
+        }
+        table tbody tr:hover {
+            background: var(--pane-bg);
+            transform: scale(1.002);
+            box-shadow: inset 3px 0 0 var(--primary);
+        }
+
+        #lightboxModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index:2000; align-items:center; justify-content:center; }
+        #lightboxModal img { max-width:90%; max-height:90%; border-radius:12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+
+        #toast { visibility: hidden; min-width: 220px; background-color: var(--sidebar-bg); color: #fff; text-align: center; border-radius: 8px; padding: 10px 16px; position: fixed; z-index: 1500; left: 50%; bottom: -50px; transform: translateX(-50%); font-size: 0.8rem; font-weight: bold; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid var(--border); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+        #toast.show { visibility: visible; bottom: 25px; transform: translateX(-50%) translateY(-5px); }
+
+        @media screen and (max-width: 900px) {
+            .portal-container {
+                flex-direction: column;
+                gap: 30px;
+                padding: 20px 15px;
+            }
+            .hero-title {
+                font-size: 2rem;
+            }
+            .hero-cards {
+                grid-template-columns: 1fr;
+            }
+            .portal-card-wrapper {
+                max-width: 100%;
+            }
+            .portal-nav, .portal-footer {
+                padding: 15px 20px;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .topbar { padding: 0 10px; height: 55px; }
+            .topbar-title, .topbar-search, #clockDisplay, .sound-selector { display: none; }
+            .topbar-right { gap: 6px; }
+            
+            .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+            .admin-content-grid { grid-template-columns: 1fr !important; gap: 12px; }
+            
+            .sidebar { width: 50px !important; padding: 10px 3px !important; }
+            .sidebar .sidebar-item span, 
+            .sidebar .sidebar-category, 
+            .sidebar .badge-count { display: none !important; }
+            .sidebar .sidebar-item { justify-content: center; padding: 8px; }
+            
+            body.mobile-chat-active .ticket-pane { display: none !important; }
+            body.mobile-chat-active .workspace-pane { display: flex !important; width: 100% !important; }
+            
+            .ticket-pane { width: 100% !important; height: 100%; }
+            .workspace-pane { display: none; width: 100%; height: 100%; }
+            
+            .reply-box { margin-bottom: 60px !important; }
+            
+            .admin-control-panel { 
+                width: 100% !important; height: 100% !important; position: absolute; z-index: 50; display: flex !important;
+            }
+            body.mobile-chat-active .admin-control-panel { display: none !important; }
+            body.mobile-chat-active .workspace-pane { display: flex !important; width: 100% !important; }
+
+            .admin-dashboard-container { padding: 12px; }
+            #createModal > div { max-width: 95% !important; padding: 15px !important; margin: 10px; }
+            #createModal div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; gap: 10px !important; }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast"></div>
+
+    <div id="announcementBanner">
+        <span id="announcementText"><i class="fa-solid fa-bullhorn"></i> Pengumuman: Sistem berjalan normal.</span>
+        <div style="display: flex; gap: 8px; flex-shrink: 0;">
+            <button class="announcement-edit" id="btnEditAnnouncementGlobal" onclick="openEditAnnouncement()" title="Edit" style="background: rgba(234, 179, 8, 0.9); border: none; color: #fff; padding: 4px 10px; border-radius: 6px; cursor: pointer; display: none; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 600;"><i class="fa-solid fa-pen"></i> Edit</button>
+            <button class="announcement-close" id="btnCloseAnnouncementGlobal" onclick="clearAnnouncement()" title="Hapus"><i class="fa-solid fa-trash"></i> Hapus</button>
+        </div>
+    </div>
+
+    <div id="lightboxModal" onclick="this.style.display='none'">
+        <img id="lightboxImg" src="">
+    </div>
+
+    <input type="file" id="customAudioFileInput" accept="audio/*" style="display: none;" onchange="handleCustomAudioUpload(this)">
+
+    <div id="loginSection">
+        <div class="portal-nav">
+            <div class="portal-brand">
+                <div class="portal-brand-logo"><i class="fa-solid fa-headset"></i></div>
+                <div class="portal-brand-text">
+                    <h1>ITCare</h1>
+                    <p>HELPDESK CENTER</p>
+                </div>
+            </div>
+
+            <div>
+                <a href="https://wa.me/628970650413?text=Halo%20Tim%20Teknisi%20IT,%20saya%20butuh%20bantuan%20support" target="_blank" class="btn-wa-support">
+                    <i class="fa-brands fa-whatsapp"></i> Kontak IT Support
+                </a>
+            </div>
+        </div>
+
+        <div class="portal-container">
+            <div class="portal-hero">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <span class="hero-badge">Layanan Solusi IT Cepat & Responsif</span>
+                    <span class="portal-clock-badge" id="portalClockDisplay">
+                        <i class="fa-regular fa-clock"></i> <span>Memuat Waktu...</span>
+                    </span>
+                </div>
+
+                <h1 class="hero-title">Sistem Layanan Terpadu</h1>
+                <p class="hero-desc">Sampaikan kendala perangkat keras, jaringan, software, Server. Dapatkan pemantauan status real-time atau hubungi tim teknis secara langsung.</p>
+                
+                <div class="hero-cards">
+                    <div class="feature-card">
+                        <i class="fa-solid fa-laptop-code feature-icon" style="color:#6366f1"></i>
+                        <h4>Tiket Terintegrasi</h4>
+                        <p>Lacak progres perbaikan langsung dari dashboard.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-comments feature-icon" style="color:#22c55e"></i>
+                        <h4>Integrasi Diskusi</h4>
+                        <p>Diskusi langsung bersama tim teknis real-time.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-bolt feature-icon" style="color:#eab308"></i>
+                        <h4>Respon Cepat SLA</h4>
+                        <p>SLA penanganan terukur oleh teknisi ahli.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portal-card-wrapper">
+                <div class="portal-card">
+                    <div class="portal-card-header">
+                        <h2><i class="fa-solid fa-lock" style="font-size: 1.1rem;"></i> Masuk ke Portal</h2>
+                        <p>Gunakan akun terdaftar Anda untuk mengakses layanan</p>
+                    </div>
+
+                    <form id="loginForm" onsubmit="return false;" autocomplete="off">
+                        <div class="portal-input-group">
+                            <label>USERNAME</label>
+                            <div class="portal-input-field">
+                                <i class="fa-solid fa-user left-icon"></i>
+                                <input type="text" id="loginUsername" placeholder="Masukkan username" autocomplete="off" value="">
+                            </div>
+                        </div>
+
+                        <div class="portal-input-group">
+                            <div class="portal-input-header">
+                                <label>PASSWORD</label>
+                                <a href="#" id="linkOpenResetModal" style="color: #818cf8; text-decoration: none; font-size: 0.75rem; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='#a5b4fc'" onmouseout="this.style.color='#818cf8'">Lupa Password?</a>
+                            </div>
+                            <div class="portal-input-field password-wrapper">
+                                <i class="fa-solid fa-key left-icon"></i>
+                                <input type="password" id="loginPassword" placeholder="Masukkan password" autocomplete="new-password" value="">
+                                <i class="fa-solid fa-eye password-toggle-icon" onclick="togglePasswordVisibility('loginPassword', this)" title="Lihat/Sembunyikan Password" style="right: 14px;"></i>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; font-size: 0.78rem;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" id="rememberMe" style="width: 14px; height: 14px; cursor: pointer; accent-color: #6366f1;">
+                                <label for="rememberMe" style="margin-bottom: 0; cursor: pointer; font-weight: 500; color: #cbd5e1; text-transform: none; letter-spacing: 0;">Ingat Saya</label>
+                            </div>
+                        </div>
+
+                        <button class="btn-portal-submit" id="btnLogin">
+                            <i class="fa-solid fa-right-to-bracket"></i> Masuk Sekarang
+                        </button>
+
+                        <div class="portal-divider">Belum memiliki akun helpdesk?</div>
+
+                        <div class="register-options-grid">
+                            <button type="button" class="btn-portal-register" id="btnOpenRegisterModal">
+                                <i class="fa-solid fa-user-plus"></i> Buat Akun
+                            </button>
+                            <a href="https://wa.me/628970650413?text=Halo,%20saya%20ingin%20mendaftar%20akun%20IT%20Helpdesk" target="_blank" class="btn-portal-register btn-portal-register-wa">
+                                <i class="fa-brands fa-whatsapp"></i> Daftar via WA
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="portal-footer">
+            <span>© 2026 IT Helpdesk Management System.</span>
+        </div>
+    </div>
+
+    <!-- MODAL REGISTRASI -->
+    <div id="registerModal" class="modal-overlay">
+        <div class="modal-card" style="max-width:400px;">
+            <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:8px;"><i class="fa-solid fa-user-plus"></i> Buat Akun Karyawan</h3>
+            <div class="form-group">
+                <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Nama Lengkap / Username *</label>
+                <input type="text" id="regUsername" placeholder="Contoh: Budi Santoso" autocomplete="off" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+                <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Nomor HP / WhatsApp *</label>
+                <input type="text" id="regNoHp" placeholder="Contoh: 08123456789" autocomplete="off" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+                <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Alamat Email *</label>
+                <input type="email" id="regEmail" placeholder="Contoh: budi@perusahaan.com" autocomplete="off" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div class="form-group" style="margin-top:10px; margin-bottom:18px;">
+                <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Password *</label>
+                <div class="password-wrapper">
+                    <input type="password" id="regPassword" placeholder="Buat password rahasia" autocomplete="new-password" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">
+                    <i class="fa-solid fa-eye password-toggle-icon" onclick="togglePasswordVisibility('regPassword', this)" title="Lihat/Sembunyikan Password"></i>
+                </div>
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+                <button type="button" id="btnCloseRegisterModal" style="background:var(--pane-bg); color:var(--text); border:1px solid var(--border); padding:8px 14px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:0.8rem;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--pane-bg)'">Batal</button>
+                <button type="button" id="btnSubmitRegister" style="background:var(--primary); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:0.8rem;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">Daftar Akun</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT USER MODERN -->
+    <div id="editUserModal" class="modal-overlay">
+        <div class="modal-card" style="max-width:420px;">
+            <h3 style="margin-bottom:15px; font-size:1.1rem; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:8px; display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-user-pen" style="color:var(--primary)"></i> Edit Data Akun Karyawan
+            </h3>
+            <input type="hidden" id="editOldUsername" value="">
+            <div class="form-group">
+                <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Nama / Username *</label>
+                <input type="text" id="editUsernameInput" placeholder="Masukkan username baru" autocomplete="off" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+                <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Nomor HP / WhatsApp</label>
+                <input type="text" id="editNoHpInput" placeholder="08xxxxxx" autocomplete="off" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+                <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Alamat Email</label>
+                <input type="email" id="editEmailInput" placeholder="email@mail.com" autocomplete="off" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+            </div>
+            <div class="form-group" style="margin-top:10px; margin-bottom:18px;">
+                <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Password Baru *</label>
+                <div class="password-wrapper">
+                    <input type="password" id="editPasswordInput" placeholder="Password rahasia" autocomplete="off" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+                    <i class="fa-solid fa-eye password-toggle-icon" onclick="togglePasswordVisibility('editPasswordInput', this)" title="Lihat/Sembunyikan Password"></i>
+                </div>
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+                <button type="button" onclick="document.getElementById('editUserModal').style.display='none'" style="background:var(--pane-bg); color:var(--text); border:1px solid var(--border); padding:8px 14px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:0.8rem;">Batal</button>
+                <button type="button" id="btnSaveEditUser" style="background:var(--primary); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:0.8rem;">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL RESET PASSWORD -->
+    <div id="resetPasswordModal" class="modal-overlay">
+        <div class="modal-card" style="max-width:400px;">
+            <h3 style="margin-bottom:12px; font-size:1.1rem; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:8px;"><i class="fa-solid fa-shield-halved" style="color:#eab308;"></i> Reset Password Ketat</h3>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">Untuk verifikasi keamanan, masukkan Username serta Nomor HP & Email terdaftar Anda.</p>
+            
+            <div class="form-group">
+                <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Username Karyawan *</label>
+                <input type="text" id="resetUsername" placeholder="Masukkan username Anda" autocomplete="off" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+                <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Nomor HP Terdaftar *</label>
+                <input type="text" id="resetNoHp" placeholder="08xxxxxx" autocomplete="off" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+                <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Email Terdaftar *</label>
+                <input type="email" id="resetEmail" placeholder="email@mail.com" autocomplete="off" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+            </div>
+            <div class="form-group" style="margin-top:10px; margin-bottom:18px;">
+                <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Password Baru *</label>
+                <div class="password-wrapper">
+                    <input type="password" id="resetNewPassword" placeholder="Masukkan password baru" autocomplete="new-password" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+                    <i class="fa-solid fa-eye password-toggle-icon" onclick="togglePasswordVisibility('resetNewPassword', this)" title="Lihat/Sembunyikan Password"></i>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+                <button type="button" id="btnCloseResetModal" style="background:var(--pane-bg); color:var(--text); border:1px solid var(--border); padding:8px 14px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:0.8rem;">Batal</button>
+                <button type="button" id="btnSubmitResetPassword" style="background:var(--primary); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:0.8rem;">Verifikasi & Ubah</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="dashboardSection">
+        <div class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-logo"><i class="fa-solid fa-headset"></i></div>
+                <div class="topbar-title">IT Helpdesk</div>
+                <div class="topbar-search">
+                    <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8"></i>
+                    <input type="text" id="searchKeyword" placeholder="Cari tiket...">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <select id="soundSelector" class="sound-selector" title="Pilih Suara Notifikasi" onchange="changeNotificationSound(this.value)">
+                    <option value="pop">💬 Bubble Pop</option>
+                    <option value="ding">🔔 Bell Chime</option>
+                    <option value="pling">✨ Magic Pling</option>
+                    <option value="marimba">🌴 Marimba</option>
+                    <option value="off">🔇 Mute</option>
+                    <option value="custom">📁 Custom MP3</option>
+                </select>
+                <button class="btn-announcement" id="btnOpenAnnouncementModal" style="display:none;"><i class="fa-solid fa-bullhorn"></i> Broadcast</button>
+                <button class="btn-icon" id="btnDarkMode" title="Ganti Tema"><i class="fa-solid fa-moon"></i></button>
+                <span id="clockDisplay" style="font-size:0.8rem; color:#94a3b8">Senin, 14 Sep 2026 | 00:00:00</span>
+                <span id="roleLabel" style="font-size: 0.8rem; font-weight: 600; display:flex; align-items:center; gap:6px;"></span>
+                <button class="btn-create" id="btnOpenCreateModal" style="display:none;"><i class="fa-solid fa-plus"></i> Buat Tiket Komplain</button>
+                <button class="btn-logout-text" id="btnLogout" title="Keluar"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+            </div>
+        </div>
+
+        <div class="app-container">
+            <div class="sidebar" id="sidebarContainer">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 5px;">
+                    <div class="sidebar-category" style="padding:5px 0;">Menu</div>
+                    <button class="btn-icon" id="toggleSidebar" style="width:24px; height:24px; font-size:0.7rem; border-radius:4px;" title="Minimize"><i class="fa-solid fa-chevron-left"></i></button>
+                </div>
+                <a href="#" class="sidebar-item active" onclick="switchTab('Semua', this)" title="Semua Tiket"><i class="fa-solid fa-inbox"></i> <span>Semua Tiket</span> <span class="badge-count" id="cntAll">0</span></a>
+                <a href="#" class="sidebar-item" onclick="switchTab('Open', this)" title="Perlu Ditindak"><i class="fa-solid fa-circle-exclamation"></i> <span>Perlu Ditindak</span> <span class="badge-count" id="cntOpen">0</span></a>
+                <a href="#" class="sidebar-item" onclick="switchTab('Proses', this)" title="Dalam Proses"><i class="fa-solid fa-spinner"></i> <span>Dalam Proses</span> <span class="badge-count" id="cntProses">0</span></a>
+                <a href="#" class="sidebar-item" onclick="switchTab('Selesai', this)" id="menuSelesaiTab" title="Arsip Selesai"><i class="fa-solid fa-circle-check"></i> <span>Arsip Selesai</span> <span class="badge-count" id="cntSelesai">0</span></a>
+                
+                <a href="#" class="sidebar-item" onclick="switchTab('UserList', this)" id="menuUserListTab" style="display:none;" title="Manajemen User"><i class="fa-solid fa-users-gear"></i> <span>Daftar User</span></a>
+
+                <div class="sidebar-category" style="margin-top: 15px;">Sistem</div>
+                <a href="#" class="sidebar-item" id="btnExportExcel" title="Export Excel"><i class="fa-solid fa-file-excel"></i> <span>Export Excel</span></a>
+                <a href="#" class="sidebar-item" onclick="printReportPDF()" title="Cetak Laporan PDF"><i class="fa-solid fa-print"></i> <span>Cetak Laporan</span></a>
+            </div>
+
+            <div class="main-content" id="mainContentArea"></div>
+        </div>
+    </div>
+
+    <!-- MODAL BUAT / EDIT TIKET -->
+    <div id="createModal" class="modal-overlay">
+        <div class="modal-card" style="max-width:800px; max-height:90vh; overflow-y:auto;">
+            <h3 id="modalTitleText" style="margin-bottom:18px; font-size:1.1rem; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:8px;">Input Data Komplain IT</h3>
+            <input type="hidden" id="editTicketId" value="">
+            
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:12px;">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Kantor Cabang *</label>
+                    <select id="uCabang" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+                        <option value="Pilih...">Pilih...</option>
+                        <option value="Cabang Kenjeran">Cabang Kenjeran</option>
+                        <option value="Cabang Prapen">Cabang Prapen</option>
+                        <option value="Cabang Mayjen">Cabang Mayjen</option>
+                        <option value="Cabang Gresik">Cabang Gresik</option>
+                        <option value="Cabang Buduran">Cabang Buduran</option>
+                        <option value="Cabang Malang">Cabang Malang</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Kategori Issue *</label>
+                    <select id="uKategori" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+                        <option value="Hardware">Hardware</option>
+                        <option value="Software">Software</option>
+                        <option value="Jaringan">Jaringan</option>
+                        <option value="Server">Server</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Apakah Berulang? *</label>
+                    <select id="uBerulang" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+                        <option value="Tidak">Tidak</option>
+                        <option value="Ya">Ya</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:12px;">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Nama Lengkap *</label>
+                    <input type="text" id="uPelapor" placeholder="Contoh: John Doe" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Nomor HP *</label>
+                    <input type="text" id="uNoHp" placeholder="08xxxxxx" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Email *</label>
+                    <input type="email" id="uEmail" placeholder="email@mail.com" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:12px;">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Divisi / Departemen *</label>
+                    <input type="text" id="uDivisi" placeholder="Contoh: Marketing" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Tingkat Prioritas *</label>
+                    <select id="uPrioritas" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+                        <option value="Low">Low</option>
+                        <option value="Normal" selected>Normal</option>
+                        <option value="High/Mendesak">High/Mendesak</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Ruangan *</label>
+                    <input type="text" id="uRuangan" placeholder="Contoh: HRD ROOM" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);">
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:18px;">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Lampirkan Foto / File</label>
+                    <div class="file-dropzone" id="dropZoneArea" onclick="document.getElementById('uAttachments').click()">
+                        <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
+                        <div class="file-drop-text">Drag & drop foto di sini atau <span>Cari File</span></div>
+                        <div class="thumb-preview-container" id="thumbPreviewBox" onclick="event.stopPropagation()"></div>
+                        <input type="file" id="uAttachments" accept="image/*" multiple style="display: none;">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Judul Kendala & Permintaan *</label>
+                    <textarea id="uDeskripsi" rows="3" placeholder="Detail kendala..." style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);"></textarea>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Catatan</label>
+                    <textarea id="uCatatan" rows="3" placeholder="Catatan tambahan" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);"></textarea>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button class="btn-primary" id="btnCloseModal" style="background:var(--pane-bg); color:var(--text); border:1px solid var(--border); padding:8px 16px; border-radius:8px; font-weight:bold; cursor:pointer;">Batal</button>
+                <button class="btn-primary" id="btnKirimTiket" style="background:var(--primary); color:#fff; border:none; padding:8px 20px; border-radius:8px; font-weight:bold; cursor:pointer;">Kirim Tiket Komplain</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL BROADCAST -->
+    <div id="announcementModal" class="modal-overlay">
+        <div class="modal-card" style="max-width:400px;">
+            <h3 style="margin-bottom:12px; font-size:1.05rem; color:var(--text);">Broadcast Pengumuman</h3>
+            <div class="form-group">
+                <label style="display:block; font-weight:600; margin-bottom:5px; font-size:0.8rem; color:var(--text-muted);">Pesan</label>
+                <textarea id="announcementInput" rows="3" placeholder="Tulis pengumuman..." style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; outline:none; font-size:0.85rem; background:var(--pane-bg); color:var(--text);"></textarea>
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
+                <button class="btn-primary" onclick="document.getElementById('announcementModal').style.display='none'" style="background:var(--pane-bg); color:var(--text); border:1px solid var(--border); padding:7px 12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:0.8rem;">Batal</button>
+                <button class="btn-primary" onclick="sendAnnouncement()" style="background:#334155; color:#fff; border:none; padding:7px 12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:0.8rem;">Kirim</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePasswordVisibility(inputId, iconEl) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                iconEl.classList.remove('fa-eye');
+                iconEl.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                iconEl.classList.remove('fa-eye-slash');
+                iconEl.classList.add('fa-eye');
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue, update, remove, set, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6_r_bYO4jqVHeqNNnwQonZy9csLD7xVU",
+            authDomain: "logbook-it-app.firebaseapp.com",
+            projectId: "logbook-it-app",
+            storageBucket: "logbook-it-app.firebasestorage.app",
+            messagingSenderId: "37262080173",
+            appId: "1:37262080173:web:3ed5d6faf69b40d7182e24"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const dbRef = ref(db, 'helpdesk_pro_clock');
+        const typingRef = ref(db, 'helpdesk_typing_status');
+        const announceRef = ref(db, 'helpdesk_announcement');
+        const memoRef = ref(db, 'helpdesk_admin_memo');
+        const connectedRef = ref(db, ".info/connected");
+        const onlineUsersRef = ref(db, 'helpdesk_online_users');
+
+        let currentUser = '';
+        let userRole = '';
+        let globalData = [];
+        let onlineUsersData = {};
+        let activeTab = 'Semua';
+        let selectedDateFilter = 'semua';
+        let specificDateFilter = '';
+        let selectedTicketId = null;
+        let typingTimer = null;
+        let latestAnnouncementText = "";
+        let adminMemoText = "";
+        let isAdminInDetailView = false;
+        let isInitialLoadDone = false;
+        let isSidebarMinimized = false;
+
+        let selectedDropFiles = [];
+
+        if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
+
+        function triggerBrowserNotification(title, body) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(title, { body, icon: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/headset.svg" });
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('helpdesk_remember_user');
+            const savedPass = localStorage.getItem('helpdesk_remember_pass');
+
+            if (savedUser && savedPass) {
+                document.getElementById('loginUsername').value = savedUser;
+                document.getElementById('loginPassword').value = savedPass;
+                document.getElementById('rememberMe').checked = true;
+            } else {
+                document.getElementById('loginUsername').value = '';
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('rememberMe').checked = false;
+            }
+
+            initDropZoneEvents();
+        });
+
+        function initDropZoneEvents() {
+            const dropZone = document.getElementById('dropZoneArea');
+            const fileInput = document.getElementById('uAttachments');
+
+            if (!dropZone || !fileInput) return;
+
+            ['dragenter', 'dragover'].forEach(evt => {
+                dropZone.addEventListener(evt, (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    dropZone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(evt => {
+                dropZone.addEventListener(evt, (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    dropZone.classList.remove('dragover');
+                }, false);
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                if (dt.files && dt.files.length > 0) {
+                    addFilesToDropZone(dt.files);
+                }
+            }, false);
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                    addFilesToDropZone(e.target.files);
+                }
+            });
+        }
+
+        function addFilesToDropZone(files) {
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    selectedDropFiles.push(file);
+                }
+            });
+            renderFileThumbnails();
+        }
+
+        window.removeThumbFile = (index) => {
+            selectedDropFiles.splice(index, 1);
+            renderFileThumbnails();
+        };
+
+        function renderFileThumbnails() {
+            const box = document.getElementById('thumbPreviewBox');
+            if (!box) return;
+
+            if (selectedDropFiles.length === 0) {
+                box.innerHTML = '';
+                return;
+            }
+
+            box.innerHTML = '';
+            selectedDropFiles.forEach((file, idx) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const card = document.createElement('div');
+                    card.className = 'thumb-preview-card';
+                    card.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview">
+                        <button type="button" class="thumb-remove-btn" onclick="removeThumbFile(${idx})" title="Hapus Gambar"><i class="fa-solid fa-xmark"></i></button>
+                    `;
+                    box.appendChild(card);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function resetDropZone() {
+            selectedDropFiles = [];
+            const input = document.getElementById('uAttachments');
+            if(input) input.value = '';
+            renderFileThumbnails();
+        }
+
+        const savedTheme = localStorage.getItem('helpdesk_theme');
+        if (savedTheme === 'dark') document.body.classList.add('dark-mode');
+
+        const btnDarkMode = document.getElementById('btnDarkMode');
+        if(document.body.classList.contains('dark-mode')) btnDarkMode.innerHTML = '<i class="fa-solid fa-sun"></i>';
+
+        btnDarkMode.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            btnDarkMode.innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+            localStorage.setItem('helpdesk_theme', isDark ? 'dark' : 'light');
+        });
+
+        const soundSelectorEl = document.getElementById('soundSelector');
+        
+        window.changeNotificationSound = (val) => {
+            if (val === 'custom') { 
+                document.getElementById('customAudioFileInput').click(); 
+                return; 
+            }
+            if (userRole === 'admin') {
+                localStorage.setItem('helpdesk_sound_admin', val);
+            } else {
+                localStorage.setItem('helpdesk_sound_' + currentUser, val);
+            }
+            if(soundSelectorEl) soundSelectorEl.value = val;
+            showToast('Suara notifikasi disimpan');
+            playCustomBeep(val);
+        };
+
+        window.handleCustomAudioUpload = (input) => {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Audio = e.target.result;
+                    if (userRole === 'admin') {
+                        localStorage.setItem('helpdesk_custom_audio_admin', base64Audio);
+                        localStorage.setItem('helpdesk_sound_admin', 'custom');
+                    } else {
+                        localStorage.setItem('helpdesk_custom_audio_' + currentUser, base64Audio);
+                        localStorage.setItem('helpdesk_sound_' + currentUser, 'custom');
+                    }
+                    if(soundSelectorEl) soundSelectorEl.value = 'custom';
+                    showToast('Audio custom dimuat & disimpan!');
+                    playCustomBeep('custom');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        };
+
+        const toggleSidebarBtn = document.getElementById('toggleSidebar');
+        const sidebarContainer = document.getElementById('sidebarContainer');
+        toggleSidebarBtn.addEventListener('click', () => {
+            isSidebarMinimized = !isSidebarMinimized;
+            sidebarContainer.classList.toggle('minimized', isSidebarMinimized);
+            toggleSidebarBtn.innerHTML = isSidebarMinimized ? '<i class="fa-solid fa-chevron-right"></i>' : '<i class="fa-solid fa-chevron-left"></i>';
+        });
+
+        function playCustomBeep(forceType = null) {
+            let savedSound = userRole === 'admin' 
+                ? localStorage.getItem('helpdesk_sound_admin') 
+                : localStorage.getItem('helpdesk_sound_' + currentUser);
+
+            let currentSound = forceType || savedSound || 'pop';
+            if (currentSound === 'off') return;
+
+            let audioSrc = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3";
+            if (currentSound === 'ding') audioSrc = "https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3";
+            else if (currentSound === 'pling') audioSrc = "https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3";
+            else if (currentSound === 'marimba') audioSrc = "https://assets.mixkit.co/active_storage/sfx/2723/2723-preview.mp3";
+            else if (currentSound === 'custom') {
+                let customAudio = userRole === 'admin' 
+                    ? localStorage.getItem('helpdesk_custom_audio_admin') 
+                    : localStorage.getItem('helpdesk_custom_audio_' + currentUser);
+                audioSrc = customAudio || audioSrc;
+            }
+
+            try { const audio = new Audio(audioSrc); audio.volume = 0.5; audio.play().catch(e => {}); } catch(e) {}
+        }
+
+        setInterval(() => {
+            const now = new Date();
+            const dateFormatted = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+            const timeFormatted = now.toTimeString().split(' ')[0];
+            const fullClockText = `${dateFormatted} | ${timeFormatted}`;
+
+            const clockEl = document.getElementById('clockDisplay');
+            if(clockEl) clockEl.textContent = fullClockText;
+
+            const portalClockEl = document.getElementById('portalClockDisplay');
+            if(portalClockEl) portalClockEl.innerHTML = `<i class="fa-regular fa-clock"></i> <span>${fullClockText}</span>`;
+        }, 1000);
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = "show";
+            setTimeout(() => t.className = "", 2500);
+        }
+
+        function refreshAnnouncementBanner() {
+            const banner = document.getElementById('announcementBanner');
+            const textEl = document.getElementById('announcementText');
+            if(latestAnnouncementText) {
+                textEl.innerHTML = `<i class="fa-solid fa-bullhorn"></i> ${latestAnnouncementText}`;
+                banner.style.display = 'flex';
+                if(userRole === 'admin') {
+                    document.getElementById('btnCloseAnnouncementGlobal').style.display = 'inline-flex';
+                    document.getElementById('btnEditAnnouncementGlobal').style.display = 'inline-flex';
+                }
+            } else { banner.style.display = 'none'; }
+        }
+
+        onValue(announceRef, (snapshot) => {
+            latestAnnouncementText = (snapshot.val() && snapshot.val().text) ? snapshot.val().text : "";
+            refreshAnnouncementBanner();
+        });
+
+        onValue(memoRef, (snapshot) => {
+            adminMemoText = (snapshot.val() && snapshot.val().text) ? snapshot.val().text : "";
+            const memoEl = document.getElementById('adminMemoInputArea');
+            if(memoEl && memoEl.value !== adminMemoText) memoEl.value = adminMemoText;
+        });
+
+        onValue(onlineUsersRef, (snapshot) => {
+            onlineUsersData = snapshot.val() || {};
+            renderApp();
+        });
+
+        function setupPresence(username) {
+            const safeUserKey = username.replace(/[.#$/\[\]]/g, "_");
+            const myPresenceRef = ref(db, `helpdesk_online_users/${safeUserKey}`);
+            
+            onValue(connectedRef, (snap) => {
+                if (snap.val() === true) {
+                    onDisconnect(myPresenceRef).set({ status: 'offline', lastSeen: serverTimestamp(), user: username });
+                    set(myPresenceRef, { status: 'online', lastSeen: serverTimestamp(), user: username });
+                }
+            });
+        }
+
+        window.saveAdminMemo = () => {
+            const val = document.getElementById('adminMemoInputArea').value;
+            set(memoRef, { text: val }).then(() => showToast('Memo internal disimpan!'));
+        };
+
+        window.clearAnnouncement = () => { set(announceRef, { text: "" }).then(() => showToast('Broadcast dihapus!')); };
+        window.openEditAnnouncement = () => {
+            document.getElementById('announcementInput').value = latestAnnouncementText;
+            document.getElementById('announcementModal').style.display = 'flex';
+        };
+        window.sendAnnouncement = () => {
+            const txt = document.getElementById('announcementInput').value.trim();
+            if(!txt) { showToast('Pesan kosong!'); return; }
+            set(announceRef, { text: txt }).then(() => {
+                document.getElementById('announcementModal').style.display = 'none';
+                showToast('Broadcast dikirim!');
+            });
+        };
+
+        document.getElementById('btnOpenRegisterModal').addEventListener('click', () => {
+            document.getElementById('regUsername').value = '';
+            document.getElementById('regNoHp').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('registerModal').style.display = 'flex';
+        });
+        document.getElementById('btnCloseRegisterModal').addEventListener('click', () => {
+            document.getElementById('registerModal').style.display = 'none';
+        });
+        document.getElementById('btnSubmitRegister').addEventListener('click', () => {
+            const rUser = document.getElementById('regUsername').value.trim();
+            const rNoHp = document.getElementById('regNoHp').value.trim();
+            const rEmail = document.getElementById('regEmail').value.trim();
+            const rPass = document.getElementById('regPassword').value.trim();
+
+            if(!rUser || !rNoHp || !rEmail || !rPass) { showToast('Semua kolom pendaftaran wajib diisi!'); return; }
+
+            let customUsers = JSON.parse(localStorage.getItem('helpdesk_custom_users') || '{}');
+            const lowerUser = rUser.toLowerCase();
+            
+            if(customUsers[rUser] || lowerUser === 'it manang' || lowerUser === 'somat' || lowerUser === 'admin2' || lowerUser === 'admin') {
+                showToast('Username sudah terdaftar / digunakan!');
+                return;
+            }
+
+            customUsers[rUser] = { password: rPass, noHp: rNoHp, email: rEmail };
+            localStorage.setItem('helpdesk_custom_users', JSON.stringify(customUsers));
+            document.getElementById('registerModal').style.display = 'none';
+            showToast('Akun berhasil dibuat! Silakan masuk.');
+            document.getElementById('loginUsername').value = rUser;
+            document.getElementById('loginPassword').value = rPass;
+            
+            if (userRole === 'admin') renderApp();
+        });
+
+        document.getElementById('linkOpenResetModal').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('resetUsername').value = '';
+            document.getElementById('resetNoHp').value = '';
+            document.getElementById('resetEmail').value = '';
+            document.getElementById('resetNewPassword').value = '';
+            document.getElementById('resetPasswordModal').style.display = 'flex';
+        });
+        document.getElementById('btnCloseResetModal').addEventListener('click', () => {
+            document.getElementById('resetPasswordModal').style.display = 'none';
+        });
+        document.getElementById('btnSubmitResetPassword').addEventListener('click', () => {
+            const rUsr = document.getElementById('resetUsername').value.trim();
+            const rPhone = document.getElementById('resetNoHp').value.trim();
+            const rMail = document.getElementById('resetEmail').value.trim();
+            const rNewPass = document.getElementById('resetNewPassword').value.trim();
+
+            if(!rUsr || !rPhone || !rMail || !rNewPass) { showToast('Semua kolom verifikasi wajib diisi!'); return; }
+
+            let customUsers = JSON.parse(localStorage.getItem('helpdesk_custom_users') || '{}');
+            
+            let matchedKey = Object.keys(customUsers).find(k => k.toLowerCase() === rUsr.toLowerCase());
+            let targetUser = matchedKey ? customUsers[matchedKey] : null;
+
+            if(!targetUser) { showToast('Username tidak ditemukan di sistem!'); return; }
+
+            let isMatched = false;
+            if (typeof targetUser === 'object') {
+                if (targetUser.noHp === rPhone && targetUser.email.toLowerCase() === rMail.toLowerCase()) isMatched = true;
+            }
+
+            if (!isMatched) {
+                const matchedTicket = globalData.find(item => 
+                    item.pelapor && item.pelapor.toLowerCase() === rUsr.toLowerCase() &&
+                    item.noHp && item.noHp.trim() === rPhone &&
+                    item.email && item.email.toLowerCase().trim() === rMail.toLowerCase()
+                );
+                if (matchedTicket) isMatched = true;
+            }
+
+            if(!isMatched) { showToast('Verifikasi gagal! Data tidak cocok.'); return; }
+
+            if (typeof targetUser === 'object') {
+                targetUser.password = rNewPass;
+                customUsers[matchedKey] = targetUser;
+            } else {
+                customUsers[matchedKey] = { password: rNewPass, noHp: rPhone, email: rMail };
+            }
+
+            localStorage.setItem('helpdesk_custom_users', JSON.stringify(customUsers));
+            document.getElementById('resetPasswordModal').style.display = 'none';
+            showToast('Password berhasil direset! Silakan login.');
+            document.getElementById('loginUsername').value = matchedKey;
+            document.getElementById('loginPassword').value = rNewPass;
+        });
+
+        const handleLogin = () => {
+            const u = document.getElementById('loginUsername').value.trim();
+            const p = document.getElementById('loginPassword').value.trim();
+            const isRemember = document.getElementById('rememberMe').checked;
+
+            if (!u || !p) {
+                showToast('Username dan Password wajib diisi!');
+                return;
+            }
+
+            const lowerU = u.toLowerCase();
+
+            let customUsers = JSON.parse(localStorage.getItem('helpdesk_custom_users') || '{}');
+            
+            let matchedKey = Object.keys(customUsers).find(k => k.toLowerCase() === lowerU);
+            let userData = matchedKey ? customUsers[matchedKey] : null;
+            let userPassword = typeof userData === 'object' ? userData?.password : userData;
+
+            if ((lowerU === 'it manang' || lowerU === 'somat' || lowerU === 'admin') && (p === 'IT123' || p === '123')) {
+                userRole = 'admin'; currentUser = u;
+                document.getElementById('roleLabel').innerHTML = `<span class="online-dot is-online" title="Online"></span> <i class="fa-solid fa-user-shield" style="color:var(--primary)"></i> ${u}`;
+                document.getElementById('btnOpenCreateModal').style.display = 'none';
+                document.getElementById('btnOpenAnnouncementModal').style.display = 'flex';
+                document.getElementById('menuSelesaiTab').style.display = 'flex';
+                document.getElementById('menuUserListTab').style.display = 'flex';
+            } else if (lowerU === 'admin2' && p === 'AdminIT') {
+                userRole = 'viewer'; currentUser = u;
+                document.getElementById('roleLabel').innerHTML = `<span class="online-dot is-online" title="Online"></span> <i class="fa-solid fa-eye" style="color:#38bdf8"></i> ${u} (Pantau)`;
+                document.getElementById('btnOpenCreateModal').style.display = 'none';
+                document.getElementById('btnOpenAnnouncementModal').style.display = 'none';
+                document.getElementById('menuSelesaiTab').style.display = 'flex';
+                document.getElementById('menuUserListTab').style.display = 'none';
+            } else if ((userPassword && userPassword === p) || (lowerU === 'user' && p === '123') || (lowerU === 'vincent' && p === '123')) {
+                userRole = 'user'; currentUser = matchedKey || u;
+                document.getElementById('roleLabel').innerHTML = `<span class="online-dot is-online" title="Online"></span> <i class="fa-solid fa-user"></i> ${currentUser}`;
+                document.getElementById('btnOpenCreateModal').style.display = 'flex';
+                document.getElementById('btnOpenAnnouncementModal').style.display = 'none';
+                document.getElementById('menuSelesaiTab').style.display = 'none';
+                document.getElementById('menuUserListTab').style.display = 'none';
+                if(activeTab === 'Selesai' || activeTab === 'UserList') activeTab = 'Semua';
+            } else { 
+                showToast('Username / Password Salah!'); 
+                return; 
+            }
+
+            if (isRemember) {
+                localStorage.setItem('helpdesk_remember_user', u);
+                localStorage.setItem('helpdesk_remember_pass', p);
+            } else {
+                localStorage.removeItem('helpdesk_remember_user');
+                localStorage.removeItem('helpdesk_remember_pass');
+            }
+
+            setupPresence(currentUser);
+
+            const soundSelect = document.getElementById('soundSelector');
+            if (soundSelect) {
+                let currentSaved = userRole === 'admin' ? localStorage.getItem('helpdesk_sound_admin') : localStorage.getItem('helpdesk_sound_' + currentUser);
+                soundSelect.value = currentSaved || 'pop';
+            }
+
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'flex';
+            refreshAnnouncementBanner();
+            showToast('Berhasil Masuk');
+            isInitialLoadDone = false;
+            renderApp();
+        };
+
+        document.getElementById('btnLogin').addEventListener('click', handleLogin);
+        document.getElementById('loginPassword').addEventListener('keypress', e => { if(e.key === 'Enter') handleLogin(); });
+        
+        document.getElementById('btnLogout').addEventListener('click', () => {
+            if(currentUser) {
+                const safeUserKey = currentUser.replace(/[.#$/\[\]]/g, "_");
+                set(ref(db, `helpdesk_online_users/${safeUserKey}`), { status: 'offline', lastSeen: serverTimestamp(), user: currentUser });
+            }
+            userRole = ''; currentUser = ''; isAdminInDetailView = false; isInitialLoadDone = false;
+
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('loginSection').style.display = 'flex';
+
+            const savedUser = localStorage.getItem('helpdesk_remember_user');
+            const savedPass = localStorage.getItem('helpdesk_remember_pass');
+
+            if (savedUser && savedPass) {
+                document.getElementById('loginUsername').value = savedUser;
+                document.getElementById('loginPassword').value = savedPass;
+                document.getElementById('rememberMe').checked = true;
+            } else {
+                document.getElementById('loginUsername').value = '';
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('rememberMe').checked = false;
+            }
+
+            selectedTicketId = null;
+            document.body.classList.remove('mobile-chat-active');
+            refreshAnnouncementBanner();
+        });
+
+        document.getElementById('btnOpenCreateModal').addEventListener('click', () => { 
+            document.getElementById('modalTitleText').innerText = "Input Komplain IT";
+            document.getElementById('btnKirimTiket').innerText = "Kirim Tiket Komplain";
+            document.getElementById('editTicketId').value = "";
+            document.getElementById('uPelapor').value = currentUser;
+
+            resetDropZone();
+
+            let customUsers = JSON.parse(localStorage.getItem('helpdesk_custom_users') || '{}');
+            let matchedKey = Object.keys(customUsers).find(k => k.toLowerCase() === currentUser.toLowerCase());
+            const userData = matchedKey ? customUsers[matchedKey] : null;
+
+            if(typeof userData === 'object' && userData !== null) {
+                if(userData.noHp) document.getElementById('uNoHp').value = userData.noHp;
+                if(userData.email) document.getElementById('uEmail').value = userData.email;
+            }
+
+            document.getElementById('createModal').style.display = 'flex'; 
+        });
+        document.getElementById('btnCloseModal').addEventListener('click', () => { 
+            document.getElementById('createModal').style.display = 'none'; 
+            resetDropZone();
+        });
+
+        window.openEditModal = (itemJSON) => {
+            let item = typeof itemJSON === 'string' ? JSON.parse(itemJSON) : itemJSON;
+            document.getElementById('modalTitleText').innerText = "Edit Tiket Komplain IT";
+            document.getElementById('btnKirimTiket').innerText = "Simpan Perubahan";
+            document.getElementById('editTicketId').value = item.id;
+            document.getElementById('uCabang').value = item.cabang || 'Pilih...';
+            document.getElementById('uKategori').value = item.kategori || 'Hardware';
+            document.getElementById('uBerulang').value = item.berulang || 'Tidak';
+            document.getElementById('uPelapor').value = item.pelapor || currentUser;
+            document.getElementById('uNoHp').value = item.noHp || '';
+            document.getElementById('uEmail').value = item.email || '';
+            document.getElementById('uDivisi').value = item.divisi || '';
+            document.getElementById('uPrioritas').value = item.prioritas || 'Normal';
+            document.getElementById('uRuangan').value = item.ruangan || '';
+            document.getElementById('uDeskripsi').value = item.deskripsi || '';
+            document.getElementById('uCatatan').value = item.catatan || '';
+            
+            resetDropZone();
+
+            document.getElementById('createModal').style.display = 'flex';
+        };
+
+        window.deleteTicket = (id) => {
+            if(confirm("Hapus Tiket Komplain ini?")) {
+                remove(ref(db, 'helpdesk_pro_clock/' + id)).then(() => {
+                    showToast('Berhasil dihapus');
+                    selectedTicketId = null; isAdminInDetailView = false;
+                    document.body.classList.remove('mobile-chat-active');
+                    renderApp();
+                });
+            }
+        };
+
+        document.getElementById('btnKirimTiket').addEventListener('click', () => {
+            const editId = document.getElementById('editTicketId').value;
+            const cabang = document.getElementById('uCabang').value;
+            const pelapor = document.getElementById('uPelapor').value.trim(); 
+            const kategori = document.getElementById('uKategori').value;
+            const berulang = document.getElementById('uBerulang').value;
+            const noHp = document.getElementById('uNoHp').value;
+            const email = document.getElementById('uEmail').value;
+            const divisi = document.getElementById('uDivisi').value;
+            const prioritas = document.getElementById('uPrioritas').value;
+            const ruangan = document.getElementById('uRuangan').value;
+            const deskripsi = document.getElementById('uDeskripsi').value;
+            const catatan = document.getElementById('uCatatan').value;
+
+            if(!pelapor || !deskripsi) { showToast('Nama & Deskripsi wajib diisi!'); return; }
+            const judulLengkap = `[${cabang}] ${deskripsi.substring(0, 40)}...`;
+
+            if(selectedDropFiles && selectedDropFiles.length > 0) {
+                let readers = [], base64Images = [];
+                selectedDropFiles.forEach(file => {
+                    let reader = new FileReader();
+                    readers.push(new Promise(resolve => {
+                        reader.onload = e => { base64Images.push(e.target.result); resolve(); };
+                        reader.readAsDataURL(file);
+                    }));
+                });
+                Promise.all(readers).then(() => {
+                    if(editId) updateExistingTicket(editId, { cabang, pelapor, kategori, berulang, noHp, email, divisi, prioritas, ruangan, deskripsi, catatan, judul: judulLengkap, attachments: base64Images });
+                    else saveTicket({ cabang, pelapor, kategori, berulang, noHp, email, divisi, prioritas, ruangan, deskripsi, catatan, judul: judulLengkap, attachments: base64Images });
+                    resetDropZone();
+                });
+            } else {
+                if(editId) {
+                    const existing = globalData.find(i => i.id === editId);
+                    updateExistingTicket(editId, { cabang, pelapor, kategori, berulang, noHp, email, divisi, prioritas, ruangan, deskripsi, catatan, judul: judulLengkap, attachments: existing ? existing.attachments : [] });
+                } else {
+                    saveTicket({ cabang, pelapor, kategori, berulang, noHp, email, divisi, prioritas, ruangan, deskripsi, catatan, judul: judulLengkap, attachments: [] });
+                }
+                resetDropZone();
+            }
+        });
+
+        function saveTicket(data) {
+            const now = new Date();
+            const rawDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+            const timeStr = now.toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+            const clockTimeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const currentMinutes = hours * 60 + minutes;
+            const startBreak = 12 * 60;        
+            const endBreak = 13 * 60 + 30;     
+
+            let initialAutoReplyText = "";
+
+            if (currentMinutes >= startBreak && currentMinutes <= endBreak) {
+                initialAutoReplyText = `🤖 [SISTEM AUTO-REPLY]\n----------------------------------------\nHalo ${data.pelapor}, tiket laporan komplain Anda telah berhasil kami terima.\n\n⚠️ **Catatan:** Tim Teknisi IT saat ini sedang dalam jam istirahat (12.00 - 13.30). Laporan Anda akan segera kami proses dan tindak lanjuti setelah jam istirahat selesai. Terima kasih atas pengertiannya! 🙏`;
+            } else {
+                initialAutoReplyText = `🤖 [SISTEM AUTO-REPLY]\n----------------------------------------\nHalo ${data.pelapor}, tiket laporan komplain Anda telah berhasil masuk ke sistem IT Helpdesk Pro. Tim teknisi kami akan segera menindaklanjuti keluhan Anda. Terima kasih!`;
+            }
+
+            const newTicketRef = push(dbRef);
+            
+            set(newTicketRef, { 
+                ...data, 
+                status: 'Open', 
+                teknisi: 'Belum ditugaskan', 
+                solusi: '-', 
+                logs: [{ text: `Dibuat oleh ${data.pelapor}`, time: timeStr }], 
+                dateKey: rawDate, 
+                waktu: timeStr, 
+                timestamp: serverTimestamp() 
+            }).then(() => {
+                push(ref(db, `helpdesk_pro_clock/${newTicketRef.key}/chats`), {
+                    sender: 'System / Auto-Reply',
+                    text: initialAutoReplyText,
+                    time: clockTimeStr,
+                    isAutoReply: true
+                });
+
+                document.getElementById('createModal').style.display = 'none';
+                showToast('Komplain Terkirim!');
+                selectedTicketId = newTicketRef.key;
+                renderApp();
+            });
+        }
+
+        function updateExistingTicket(id, data) {
+            let timeStr = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+            const target = globalData.find(i => i.id === id);
+            let logs = target.logs || [];
+            logs.push({ text: `Diedit oleh ${currentUser}`, time: timeStr });
+            update(ref(db, 'helpdesk_pro_clock/' + id), { ...data, logs }).then(() => {
+                document.getElementById('createModal').style.display = 'none';
+                showToast('Perubahan disimpan!');
+                renderApp();
+            });
+        }
+
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            let newData = [];
+            if(data) {
+                Object.keys(data).forEach(key => {
+                    let item = data[key];
+                    if (!item.dateKey && item.timestamp) {
+                        let d = new Date(item.timestamp);
+                        item.dateKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                    }
+
+                    let chatsArray = [];
+                    if (item.chats) {
+                        if (Array.isArray(item.chats)) {
+                            chatsArray = item.chats.filter(Boolean);
+                        } else if (typeof item.chats === 'object') {
+                            chatsArray = Object.keys(item.chats).map(ckey => item.chats[ckey]);
+                        }
+                    }
+
+                    newData.push({ id: key, ...item, chats: chatsArray });
+                });
+                newData.sort((a,b) => b.timestamp - a.timestamp);
+            }
+
+            if (!isInitialLoadDone) { globalData = newData; isInitialLoadDone = true; renderApp(); return; }
+
+            if (globalData.length > 0 && newData.length > globalData.length) {
+                if ((userRole === 'admin' || userRole === 'viewer') && !isAdminInDetailView) { 
+                    playCustomBeep(); 
+                    showToast('Tiket baru masuk!'); 
+                    triggerBrowserNotification("Tiket Baru Masuk!", `Ada tiket komplain baru di sistem Helpdesk.`);
+                }
+            } else if (globalData.length > 0 && newData.length > 0) {
+                for(let i = 0; i < newData.length; i++) {
+                    let oldItem = globalData.find(o => o.id === newData[i].id);
+                    let newItem = newData[i];
+                    if (oldItem && (newItem.chats || []).length > (oldItem.chats || []).length) {
+                        let lastChat = newItem.chats[newItem.chats.length - 1];
+                        if (lastChat && lastChat.sender !== currentUser) {
+                            playCustomBeep(); 
+                            showToast(`Pesan baru dari ${lastChat.sender}`);
+                            triggerBrowserNotification(`Pesan dari ${lastChat.sender}`, lastChat.text || "Voice note terkirim.");
+                        }
+                    }
+                }
+            }
+            
+            globalData = newData;
+            
+            if (selectedTicketId) {
+                const currentItem = globalData.find(i => i.id === selectedTicketId);
+                if (currentItem) renderWorkspaceContent(currentItem);
+            } else {
+                renderApp();
+            }
+        });
+
+        onValue(typingRef, (snapshot) => {
+            let typingData = snapshot.val() || {};
+            if(selectedTicketId && typingData[selectedTicketId]) {
+                const typingBox = document.getElementById('typingIndicator');
+                if(typingBox) {
+                    if(typingData[selectedTicketId] !== currentUser) {
+                        typingBox.style.display = 'block';
+                        typingBox.innerHTML = `<i class="fa-solid fa-ellipsis"></i> ${typingData[selectedTicketId]} sedang mengetik...`;
+                    } else { typingBox.style.display = 'none'; }
+                }
+            }
+        });
+
+        window.switchTab = (tab, el) => {
+            activeTab = tab; isAdminInDetailView = false;
+            document.body.classList.remove('mobile-chat-active');
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            if(el) el.classList.add('active');
+            renderApp();
+        };
+
+        window.printReportPDF = () => window.print();
+
+        function renderApp() {
+            sidebarContainer.classList.toggle('minimized', isSidebarMinimized);
+            let scopeData = userRole === 'user' ? globalData.filter(i => i.pelapor && i.pelapor.toLowerCase().trim() === currentUser.toLowerCase().trim()) : globalData;
+            let o=0, p=0, s=0;
+            scopeData.forEach(i => { if(i.status === 'Open') o++; if(i.status === 'Proses') p++; if(i.status === 'Selesai') s++; });
+
+            document.getElementById('cntAll').innerText = scopeData.length;
+            document.getElementById('cntOpen').innerText = o;
+            document.getElementById('cntProses').innerText = p;
+            document.getElementById('cntSelesai').innerText = s;
+
+            if (activeTab === 'UserList' && userRole === 'admin') {
+                renderUserManagementView();
+            } else if ((userRole === 'admin' || userRole === 'viewer') && !isAdminInDetailView) {
+                renderAdminDashboard(globalData, o, p, s);
+            } else if (userRole === 'user') {
+                renderUserWorkspace(scopeData, o, p, s);
+            }
+        }
+
+        function renderUserManagementView() {
+            let customUsers = JSON.parse(localStorage.getItem('helpdesk_custom_users') || '{}');
+            let userKeys = Object.keys(customUsers);
+            
+            let onlineCount = 0;
+            userKeys.forEach(u => {
+                let safeKey = u.replace(/[.#$/\[\]]/g, "_");
+                if (onlineUsersData[safeKey] && onlineUsersData[safeKey].status === 'online') onlineCount++;
+            });
+
+            let searchKey = (document.getElementById('searchUserKeyword')?.value || '').toLowerCase();
+            let filteredKeys = userKeys.filter(u => {
+                let data = customUsers[u];
+                let noHp = typeof data === 'object' ? (data.noHp || '') : '';
+                let email = typeof data === 'object' ? (data.email || '') : '';
+                return u.toLowerCase().includes(searchKey) || noHp.includes(searchKey) || email.toLowerCase().includes(searchKey);
+            });
+
+            let rowsHtml = filteredKeys.map((u) => {
+                let data = customUsers[u];
+                let noHp = typeof data === 'object' ? (data.noHp || '-') : '-';
+                let email = typeof data === 'object' ? (data.email || '-') : '-';
+                let pass = typeof data === 'object' ? (data.password || '-') : data;
+
+                let safeKey = u.replace(/[.#$/\[\]]/g, "_");
+                let isOnline = onlineUsersData[safeKey] && onlineUsersData[safeKey].status === 'online';
+                
+                let userTicketCount = globalData.filter(t => t.pelapor && t.pelapor.toLowerCase().trim() === u.toLowerCase().trim()).length;
+                let userObjStr = encodeURIComponent(JSON.stringify({ username: u, noHp, email, password: pass }));
+
+                return `
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 12px; font-weight:600;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="online-dot ${isOnline ? 'is-online' : 'is-offline'}" title="${isOnline ? 'Online' : 'Offline'}"></span>
+                                <div>
+                                    <div style="color:var(--text);">${u}</div>
+                                    <span style="font-size:0.65rem; color:${isOnline ? '#22c55e' : 'var(--text-muted)'}; font-weight:normal;">${isOnline ? 'Sedang Online' : 'Offline'}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 12px;">${noHp}</td>
+                        <td style="padding: 12px;">${email}</td>
+                        <td style="padding: 12px;">
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <span id="passText_${safeKey}" style="font-family:monospace; font-weight:bold;">••••••••</span>
+                                <i class="fa-solid fa-eye" style="cursor:pointer; color:var(--text-muted); font-size:0.75rem; transition: transform 0.2s;" title="Lihat Password" onclick="toggleShowPass('${safeKey}', '${pass}')" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='none'"></i>
+                            </div>
+                        </td>
+                        <td style="padding: 12px;"><span class="badge" style="background:rgba(79,70,229,0.1); color:var(--primary);">${userTicketCount} Tiket</span></td>
+                        <td style="padding: 12px; text-align:right;">
+                            <div style="display:flex; gap:6px; justify-content:flex-end;">
+                                <button onclick="adminEditUserModal(JSON.parse(decodeURIComponent('${userObjStr}')))" style="background:var(--pane-bg); color:var(--text); border:1px solid var(--border); padding:5px 9px; border-radius:6px; cursor:pointer; font-size:0.7rem; transition: all 0.2s;" onmouseover="this.style.background='var(--primary)'; this.style.color='#fff'" onmouseout="this.style.background='var(--pane-bg)'; this.style.color='var(--text)'"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                                <button onclick="adminResetUserPass('${u}')" style="background:var(--pane-bg); color:var(--text); border:1px solid var(--border); padding:5px 9px; border-radius:6px; cursor:pointer; font-size:0.7rem; transition: all 0.2s;" onmouseover="this.style.background='var(--primary)'; this.style.color='#fff'" onmouseout="this.style.background='var(--pane-bg)'; this.style.color='var(--text)'"><i class="fa-solid fa-key"></i> Reset</button>
+                                <button onclick="adminDeleteUser('${u}')" style="background:rgba(239, 68, 68, 0.1); color:#dc2626; border:1px solid rgba(239, 68, 68, 0.3); padding:5px 9px; border-radius:6px; cursor:pointer; font-size:0.7rem; transition: all 0.2s;" onmouseover="this.style.background='#dc2626'; this.style.color='#fff'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.color='#dc2626'"><i class="fa-solid fa-trash"></i> Hapus</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('') || `<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada user ditemukan.</td></tr>`;
+
+            document.getElementById('mainContentArea').innerHTML = `
+                <div style="flex:1; padding:20px; overflow-y:auto; background:var(--bg); display:flex; flex-direction:column; gap:15px;">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-info"><h4>Total User</h4><h2>${userKeys.length}</h2></div>
+                            <div class="stat-icon" style="background:rgba(79,70,229,0.12);color:var(--primary)"><i class="fa-solid fa-users"></i></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-info"><h4>User Online</h4><h2>${onlineCount}</h2></div>
+                            <div class="stat-icon" style="background:rgba(34,197,94,0.12);color:#22c55e"><i class="fa-solid fa-user-check"></i></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-info"><h4>User Offline</h4><h2>${userKeys.length - onlineCount}</h2></div>
+                            <div class="stat-icon" style="background:rgba(148,163,184,0.12);color:#94a3b8"><i class="fa-solid fa-user-slash"></i></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-info"><h4>Total Tiket</h4><h2>${globalData.length}</h2></div>
+                            <div class="stat-icon" style="background:rgba(217,119,6,0.12);color:#d97706"><i class="fa-solid fa-ticket"></i></div>
+                        </div>
+                    </div>
+
+                    <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; box-shadow:0 4px 6px rgba(0,0,0,0.02);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+                            <h3 style="font-size:1.05rem; color:var(--text); display:flex; align-items:center; gap:8px;">
+                                <i class="fa-solid fa-users-gear" style="color:var(--primary)"></i> Manajemen Akun Karyawan
+                            </h3>
+                            <div style="display:flex; gap:8px;">
+                                <input type="text" id="searchUserKeyword" placeholder="Cari nama / email / HP..." style="padding:6px 12px; border:1px solid var(--border); border-radius:8px; font-size:0.8rem; background:var(--pane-bg); color:var(--text); outline:none; transition: all 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" value="${searchKey}" oninput="renderUserManagementView()">
+                                <button onclick="document.getElementById('registerModal').style.display='flex'" class="btn-primary" style="background:var(--primary); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:0.8rem; font-weight:600; cursor:pointer; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'"><i class="fa-solid fa-plus"></i> Tambah Akun</button>
+                            </div>
+                        </div>
+
+                        <table style="width:100%; border-collapse:collapse; font-size:0.8rem; text-align:left;">
+                            <thead>
+                                <tr style="background:var(--pane-bg); color:var(--text-muted); text-transform:uppercase; font-size:0.7rem;">
+                                    <th style="padding:10px 12px;">User & Status</th>
+                                    <th style="padding:10px 12px;">No HP</th>
+                                    <th style="padding:10px 12px;">Email</th>
+                                    <th style="padding:10px 12px;">Password</th>
+                                    <th style="padding:10px 12px;">Aktivitas</th>
+                                    <th style="padding:10px 12px; text-align:right;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rowsHtml}</tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.toggleShowPass = (key, realPass) => {
+            let el = document.getElementById(`passText_${key}`);
+            if (el) {
+                if (el.textContent === '••••••••') {
+                    el.textContent = realPass;
+                    el.style.color = 'var(--primary)';
+                } else {
+                    el.textContent = '••••••••';
+                    el.style.color = 'inherit';
+                }
+            }
+        };
+
+        window.adminEditUserModal = (userObj) => {
+            document.getElementById('editOldUsername').value = userObj.username;
+            document.getElementById('editUsernameInput').value = userObj.username;
+            document.getElementById('editNoHpInput').value = userObj.noHp || '';
+            document.getElementById('editEmailInput').value = userObj.email || '';
+            document.getElementById('editPasswordInput').value = userObj.password || '';
+            document.getElementById('editUserModal').style.display = 'flex';
+        };
+
+        document.getElementById('btnSaveEditUser').addEventListener('click', () => {
+            let oldName = document.getElementById('editOldUsername').value;
+            let newName = document.getElementById('editUsernameInput').value.trim();
+            let newNoHp = document.getElementById('editNoHpInput').value.trim();
+            let newEmail = document.getElementById('editEmailInput').value.trim();
+            let newPass = document.getElementById('editPasswordInput').value.trim();
+
+            if (!newName || !newPass) {
+                showToast('Username dan Password wajib diisi!');
+                return;
+            }
+
+            let customUsers = JSON.parse(localStorage.getItem('helpdesk_custom_users') || '{}');
+
+            if (newName.toLowerCase() !== oldName.toLowerCase()) {
+                let exists = Object.keys(customUsers).some(k => k.toLowerCase() === newName.toLowerCase());
+                if (exists) {
+                    showToast('Username baru sudah digunakan user lain!');
+                    return;
+                }
+                let oldKey = Object.keys(customUsers).find(k => k.toLowerCase() === oldName.toLowerCase());
+                if (oldKey) delete customUsers[oldKey];
+            }
+
+            customUsers[newName] = { password: newPass, noHp: newNoHp, email: newEmail };
+            localStorage.setItem('helpdesk_custom_users', JSON.stringify(customUsers));
+
+            document.getElementById('editUserModal').style.display = 'none';
+            showToast(`Data user ${newName} berhasil diperbarui!`);
+            renderApp();
+        });
+
+        window.adminResetUserPass = (usr) => {
+            let customUsers = JSON.parse(localStorage.getItem('helpdesk_custom_users') || '{}');
+            let matchedKey = Object.keys(customUsers).find(k => k.toLowerCase() === usr.toLowerCase());
+            let data = matchedKey ? customUsers[matchedKey] : null;
+            if (data) {
+                let currentPass = typeof data === 'object' ? data.password : data;
+                adminEditUserModal({
+                    username: matchedKey,
+                    noHp: typeof data === 'object' ? data.noHp : '',
+                    email: typeof data === 'object' ? data.email : '',
+                    password: currentPass
+                });
+            }
+        };
+
+        window.adminDeleteUser = (usr) => {
+            if (confirm(`Hapus akun ${usr} dari sistem?`)) {
+                let customUsers = JSON.parse(localStorage.getItem('helpdesk_custom_users') || '{}');
+                let matchedKey = Object.keys(customUsers).find(k => k.toLowerCase() === usr.toLowerCase());
+                if (matchedKey) delete customUsers[matchedKey];
+                localStorage.setItem('helpdesk_custom_users', JSON.stringify(customUsers));
+                showToast(`Akun ${usr} dihapus!`);
+                renderApp();
+            }
+        };
+
+        function renderAdminDashboard(scopeData, openCnt, prosesCnt, selesaiCnt) {
+            const keyword = document.getElementById('searchKeyword').value.toLowerCase();
+
+            const now = new Date();
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+            
+            let filtered = scopeData.filter(item => {
+                let matchTab = (activeTab === 'Semua' || item.status === activeTab);
+                let matchKeyword = (item.judul && item.judul.toLowerCase().includes(keyword)) || (item.pelapor && item.pelapor.toLowerCase().includes(keyword));
+                
+                let matchDate = true;
+                if (selectedDateFilter === 'hariIni') matchDate = (item.dateKey === todayStr);
+                else if (selectedDateFilter === 'bulanIni') {
+                    let m = String(now.getMonth()+1).padStart(2,'0');
+                    matchDate = item.dateKey && item.dateKey.startsWith(`${now.getFullYear()}-${m}`);
+                } else if (selectedDateFilter === 'spesifik' && specificDateFilter) {
+                    matchDate = (item.dateKey === specificDateFilter);
+                }
+
+                return matchTab && matchKeyword && matchDate;
+            });
+
+            let catHardware = scopeData.filter(i => i.kategori === 'Hardware').length;
+            let catSoftware = scopeData.filter(i => i.kategori === 'Software').length;
+            let catJaringan = scopeData.filter(i => i.kategori === 'Jaringan').length;
+            let catServer = scopeData.filter(i => i.kategori === 'Server').length;
+            let catLainnya = scopeData.filter(i => i.kategori === 'Lainnya').length;
+            let maxCat = Math.max(catHardware, catSoftware, catJaringan, catServer, catLainnya, 1);
+
+            let allActivities = [];
+            scopeData.forEach(item => {
+                if(item.logs && Array.isArray(item.logs)) {
+                    item.logs.forEach(l => { allActivities.push({ text: `[${item.cabang || 'Pusat'}] ${l.text}`, time: l.time }); });
+                }
+            });
+            allActivities.sort((a,b) => new Date(b.time) - new Date(a.time));
+            let recentActivitiesHtml = allActivities.slice(0, 5).map(act => `
+                <div style="font-size: 0.75rem; display: flex; align-items: flex-start; gap: 8px; border-bottom: 1px dashed var(--border); padding-bottom: 6px; transition: background 0.2s;" onmouseover="this.style.background='var(--pane-bg)'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-circle-dot" style="color:var(--primary); font-size: 0.5rem; margin-top: 4px;"></i>
+                    <div style="flex:1;">
+                        <div style="color:var(--text); font-weight:600;">${act.text}</div>
+                        <div style="color:var(--text-muted); font-size: 0.65rem;">${act.time}</div>
+                    </div>
+                </div>
+            `).join('') || `<div style="color:var(--text-muted); font-size: 0.75rem; text-align:center;">Belum ada aktivitas.</div>`;
+
+            document.getElementById('mainContentArea').innerHTML = `
+                <div class="admin-dashboard-container">
+                    <div class="stats-grid">
+                        <div class="stat-card" style="cursor:pointer;" onclick="switchTab('Semua')"><div class="stat-info"><h4>Total</h4><h2>${scopeData.length}</h2></div><div class="stat-icon" style="background:rgba(79,70,229,0.12);color:var(--primary)"><i class="fa-solid fa-inbox"></i></div></div>
+                        <div class="stat-card" style="cursor:pointer;" onclick="switchTab('Open')"><div class="stat-info"><h4>Open</h4><h2>${openCnt}</h2></div><div class="stat-icon" style="background:rgba(220,38,38,0.12);color:#dc2626"><i class="fa-solid fa-circle-exclamation"></i></div></div>
+                        <div class="stat-card" style="cursor:pointer;" onclick="switchTab('Proses')"><div class="stat-info"><h4>Proses</h4><h2>${prosesCnt}</h2></div><div class="stat-icon" style="background:rgba(217,119,6,0.12);color:#d97706"><i class="fa-solid fa-spinner"></i></div></div>
+                        <div class="stat-card" style="cursor:pointer;" onclick="switchTab('Selesai')"><div class="stat-info"><h4>Selesai</h4><h2>${selesaiCnt}</h2></div><div class="stat-icon" style="background:rgba(22,163,74,0.12);color:#16a34a"><i class="fa-solid fa-circle-check"></i></div></div>
+                    </div>
+
+                    <div class="admin-content-grid" style="grid-template-columns: 1.5fr 1fr;">
+                        <div class="admin-box">
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                                <h3 style="border-bottom:none; padding-bottom:0; margin-bottom:0;"><span><i class="fa-solid fa-list"></i> Daftar Tiket (${activeTab})</span></h3>
+                                
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <select class="modern-select" id="filterDateDropdown" style="padding:4px 8px; font-size:0.75rem;" onchange="changeAdminDateFilter(this.value)">
+                                        <option value="semua" ${selectedDateFilter === 'semua' ? 'selected' : ''}>Semua Waktu</option>
+                                        <option value="hariIni" ${selectedDateFilter === 'hariIni' ? 'selected' : ''}>Hari Ini</option>
+                                        <option value="bulanIni" ${selectedDateFilter === 'bulanIni' ? 'selected' : ''}>Bulan Ini</option>
+                                        <option value="spesifik" ${selectedDateFilter === 'spesifik' ? 'selected' : ''}>Pilih Tanggal...</option>
+                                    </select>
+                                    <input type="date" id="specificDateInput" style="display:${selectedDateFilter === 'spesifik' ? 'inline-block' : 'none'}; padding:3px 6px; border:1px solid var(--border); border-radius:6px; font-size:0.75rem; background:var(--pane-bg); color:var(--text);" value="${specificDateFilter}" onchange="changeSpecificDateVal(this.value)">
+                                </div>
+                            </div>
+                            <div id="adminTicketList"></div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div class="admin-box" style="flex:1;">
+                                <h3><span><i class="fa-solid fa-chart-column"></i> Grafik Kategori Isu</span></h3>
+                                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 5px; font-size: 0.8rem;">
+                                    <div><div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>Hardware</span><b>${catHardware}</b></div><div style="background:var(--pane-bg); border-radius:4px; height:6px; overflow:hidden;"><div style="background:var(--primary); height:100%; width:${(catHardware/maxCat)*100}%; transition: width 0.5s ease;"></div></div></div>
+                                    <div><div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>Software</span><b>${catSoftware}</b></div><div style="background:var(--pane-bg); border-radius:4px; height:6px; overflow:hidden;"><div style="background:#38bdf8; height:100%; width:${(catSoftware/maxCat)*100}%; transition: width 0.5s ease;"></div></div></div>
+                                    <div><div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>Jaringan</span><b>${catJaringan}</b></div><div style="background:var(--pane-bg); border-radius:4px; height:6px; overflow:hidden;"><div style="background:#f59e0b; height:100%; width:${(catJaringan/maxCat)*100}%; transition: width 0.5s ease;"></div></div></div>
+                                    <div><div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>Server</span><b>${catServer}</b></div><div style="background:var(--pane-bg); border-radius:4px; height:6px; overflow:hidden;"><div style="background:#10b981; height:100%; width:${(catServer/maxCat)*100}%; transition: width 0.5s ease;"></div></div></div>
+                                    <div><div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>Lainnya</span><b>${catLainnya}</b></div><div style="background:var(--pane-bg); border-radius:4px; height:6px; overflow:hidden;"><div style="background:#64748b; height:100%; width:${(catLainnya/maxCat)*100}%; transition: width 0.5s ease;"></div></div></div>
+                                </div>
+                            </div>
+
+                            <div class="admin-box" style="flex:1;">
+                                <h3><span><i class="fa-solid fa-bolt" style="color:#eab308;"></i> Aktivitas Terbaru</span></h3>
+                                <div style="display: flex; flex-direction: column; gap: 8px; max-height: 120px; overflow-y: auto;">
+                                    ${recentActivitiesHtml}
+                                </div>
+                            </div>
+
+                            <div class="admin-box" style="flex:1;">
+                                <h3><span><i class="fa-solid fa-note-sticky" style="color:#ec4899;"></i> Memo Internal Tim IT</span></h3>
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    <textarea id="adminMemoInputArea" rows="2" placeholder="Tulis catatan/memo internal tim IT di sini..." style="width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:6px; outline:none; font-size:0.75rem; background:var(--pane-bg); color:var(--text); resize:none; transition: all 0.25s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">${adminMemoText}</textarea>
+                                    <button onclick="saveAdminMemo()" class="btn-primary" style="background:var(--primary); color:#fff; border:none; padding:4px 10px; border-radius:6px; font-size:0.7rem; font-weight:bold; cursor:pointer; align-self:flex-end; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'"><i class="fa-solid fa-floppy-disk"></i> Simpan Memo</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const listContainer = document.getElementById('adminTicketList');
+            if(listContainer && filtered.length > 0) {
+                listContainer.innerHTML = '';
+                filtered.forEach(item => {
+                    let badgeClass = item.status === 'Open' ? 'status-open' : (item.status === 'Proses' ? 'status-proses' : 'status-selesai');
+                    const div = document.createElement('div');
+                    div.className = `ticket-item`;
+                    div.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="badge ${badgeClass}">${item.status || 'Open'}</span>
+                            <span style="font-size:0.78rem; color:var(--text-muted); font-weight:500;"><i class="fa-regular fa-clock"></i> ${item.waktu || ''}</span>
+                        </div>
+                        <div class="ticket-item-title">${item.judul || 'Tanpa Judul'}</div>
+                        <div class="ticket-item-snippet">${item.deskripsi || ''}</div>
+                        <div class="ticket-item-meta">
+                            <span><i class="fa-solid fa-user" style="color:var(--primary);"></i> ${item.pelapor || 'Karyawan'}</span>
+                            <span style="color:var(--primary); font-weight:600; display:flex; align-items:center; gap:4px;">Lihat Detail <i class="fa-solid fa-chevron-right" style="font-size:0.7rem;"></i></span>
+                        </div>
+                    `;
+                    div.onclick = () => { 
+                        selectedTicketId = item.id; isAdminInDetailView = true;
+                        document.body.classList.add('mobile-chat-active');
+                        openAdminWorkspaceModal(item); 
+                    };
+                    listContainer.appendChild(div);
+                });
+            } else if(listContainer) {
+                listContainer.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:0.85rem; background:var(--pane-bg); border-radius:10px; border:1px dashed var(--border);">Tidak ada tiket pada kriteria/filter ini.</div>`;
+            }
+        }
+
+        window.changeAdminDateFilter = (val) => {
+            selectedDateFilter = val;
+            renderApp();
+        };
+
+        window.changeSpecificDateVal = (val) => {
+            specificDateFilter = val;
+            renderApp();
+        };
+
+        window.openAdminWorkspaceModal = (item) => {
+            isAdminInDetailView = true; selectedTicketId = item.id;
+            document.body.classList.add('mobile-chat-active');
+
+            let controlPanelHtml = `
+                <div class="modern-control-group">
+                    <label>Status</label>
+                    <select class="modern-select" id="propStatusAdmin">
+                        <option value="Open">🔴 Open</option>
+                        <option value="Proses">🟡 Proses</option>
+                        <option value="Selesai">🟢 Selesai</option>
+                    </select>
+                </div>
+            `;
+
+            let safeUserKey = item.pelapor ? item.pelapor.replace(/[.#$/\[\]]/g, "_") : '';
+            let isUserOnline = onlineUsersData[safeUserKey] && onlineUsersData[safeUserKey].status === 'online';
+
+            document.getElementById('mainContentArea').innerHTML = `
+                <div style="display:flex; width:100%; height:100%; position:relative;">
+                    <div class="admin-control-panel">
+                        <div class="admin-control-header">
+                            <button class="btn-primary" id="btnBackToDashboard" style="background:var(--card); color:var(--text); border:1px solid var(--border); padding:5px 10px; border-radius:6px; cursor:pointer; font-size:0.75rem; display:inline-flex; align-items:center; gap:6px; transition: all 0.2s;" onmouseover="this.style.background='var(--pane-bg)'" onmouseout="this.style.background='var(--card)'"><i class="fa-solid fa-arrow-left"></i>&nbsp;Kembali</button>
+                            <span style="font-weight:700; font-size:0.8rem;">Kontrol</span>
+                        </div>
+                        <div class="admin-control-body">
+                            ${controlPanelHtml}
+                            <div class="modern-control-group" style="margin-top:2px;">
+                                <label>Info Pelapor</label>
+                                <div class="modern-info-card">
+                                    <div class="modern-info-row"><span class="modern-info-label">Status User</span><span class="modern-info-val"><span class="online-dot ${isUserOnline ? 'is-online' : 'is-offline'}"></span> ${isUserOnline ? 'Online' : 'Offline'}</span></div>
+                                    <div class="modern-info-row"><span class="modern-info-label">Cabang</span><span class="modern-info-val">${item.cabang || '-'}</span></div>
+                                    <div class="modern-info-row"><span class="modern-info-label">Nama</span><span class="modern-info-val">${item.pelapor || '-'}</span></div>
+                                    <div class="modern-info-row"><span class="modern-info-label">No HP</span><span class="modern-info-val">${item.noHp || '-'}</span></div>
+                                    <div class="modern-info-row"><span class="modern-info-label">Email</span><span class="modern-info-val">${item.email || '-'}</span></div>
+                                    <div class="modern-info-row"><span class="modern-info-label">Divisi</span><span class="modern-info-val">${item.divisi || '-'}</span></div>
+                                    <div class="modern-info-row"><span class="modern-info-label">Ruangan</span><span class="modern-info-val">${item.ruangan || '-'}</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="workspace-pane" id="workspaceDetail" style="flex:1;"></div>
+                </div>
+            `;
+
+            document.getElementById('btnBackToDashboard').addEventListener('click', () => { 
+                isAdminInDetailView = false; selectedTicketId = null;
+                document.body.classList.remove('mobile-chat-active');
+                renderApp(); 
+            });
+
+            const statusEl = document.getElementById('propStatusAdmin');
+            statusEl.value = item.status;
+            statusEl.onchange = () => {
+                let newStatus = statusEl.value;
+                let updateData = { status: newStatus, teknisi: currentUser };
+                if (newStatus === 'Selesai' && item.solusi === '-') updateData.solusi = 'Kendala diselesaikan.';
+                let logs = item.logs || [];
+                let timeStr = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+                logs.push({ text: `Status diubah ke ${newStatus} oleh ${currentUser}`, time: timeStr });
+                updateData.logs = logs;
+
+                push(ref(db, `helpdesk_pro_clock/${item.id}/chats`), {
+                    sender: 'System / Auto-Reply',
+                    text: `🤖 [SISTEM AUTO-REPLY]\n----------------------------------------\nStatus tiket komplain diubah menjadi [${newStatus}] oleh ${currentUser}.`,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    isAutoReply: true
+                });
+
+                update(ref(db, 'helpdesk_pro_clock/' + item.id), updateData);
+                showToast('Status diperbarui');
+            };
+
+            renderWorkspaceContent(item);
+        }
+
+        function renderUserWorkspace(scopeData, openCnt, prosesCnt, selesaiCnt) {
+            const keyword = document.getElementById('searchKeyword').value.toLowerCase();
+            const filtered = scopeData.filter(item => (activeTab === 'Semua' || item.status === activeTab) && (item.judul.toLowerCase().includes(keyword) || item.pelapor.toLowerCase().includes(keyword)));
+
+            document.getElementById('mainContentArea').innerHTML = `
+                <div class="ticket-pane" id="ticketPaneContainer">
+                    <div class="pane-header">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>Daftar Tiket Saya</span>
+                            <span style="font-size: 0.75rem; color: var(--primary); font-weight: 600;"><i class="fa-solid fa-ticket"></i> Total: ${scopeData.length}</span>
+                        </div>
+                        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 5px;">
+                            <div style="background:var(--card); border:1px solid var(--border); padding:6px; border-radius:6px; text-align:center;">
+                                <div style="font-size:0.65rem; color:var(--text-muted);">Open</div>
+                                <div style="font-size:0.85rem; font-weight:bold; color:#dc2626;">${openCnt}</div>
+                            </div>
+                            <div style="background:var(--card); border:1px solid var(--border); padding:6px; border-radius:6px; text-align:center;">
+                                <div style="font-size:0.65rem; color:var(--text-muted);">Proses</div>
+                                <div style="font-size:0.85rem; font-weight:bold; color:#d97706;">${prosesCnt}</div>
+                            </div>
+                            <div style="background:var(--card); border:1px solid var(--border); padding:6px; border-radius:6px; text-align:center;">
+                                <div style="font-size:0.65rem; color:var(--text-muted);">Selesai</div>
+                                <div style="font-size:0.85rem; font-weight:bold; color:#16a34a;">${selesaiCnt}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ticket-scroll-list" id="ticketListPane"></div>
+                </div>
+                <div class="workspace-pane" id="workspaceDetail" style="display:flex;">
+                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--text-muted); font-size:0.85rem; padding:30px; text-align:center; gap: 12px;">
+                        <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(79, 70, 229, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.1) rotate(10deg)'" onmouseout="this.style.transform='none'">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <div>
+                            <h3 style="color: var(--text); font-size: 1rem; margin-bottom: 4px;">Halo, ${currentUser}! 👋</h3>
+                            <p style="font-size: 0.8rem; max-width: 280px; line-height: 1.4;">Pilih tiket di sebelah kiri untuk melihat detail atau chat dengan tim IT. Butuh bantuan? Klik tombol + Tiket Komplain di atas.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const listPane = document.getElementById('ticketListPane');
+            if(filtered.length === 0) {
+                listPane.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:0.8rem; background:var(--card); border-radius:10px; border:1px dashed var(--border);">Belum ada riwayat komplain.</div>`;
+                return;
+            }
+
+            if (!selectedTicketId && filtered.length > 0) {
+                selectedTicketId = filtered[0].id;
+            }
+
+            filtered.forEach(item => {
+                let badgeClass = item.status === 'Open' ? 'status-open' : (item.status === 'Proses' ? 'status-proses' : 'status-selesai');
+                const div = document.createElement('div');
+                div.className = `ticket-item ${selectedTicketId === item.id ? 'active' : ''}`;
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="badge ${badgeClass}">${item.status}</span>
+                        <span style="font-size:0.75rem; color:var(--text-muted);">${item.waktu ? item.waktu.split(',')[0] : ''}</span>
+                    </div>
+                    <div class="ticket-item-title">${item.judul}</div>
+                    <div class="ticket-item-snippet">${item.deskripsi}</div>
+                    <div class="ticket-item-meta">
+                        <span><i class="fa-solid fa-user"></i> ${item.pelapor}</span>
+                        <span style="color:var(--primary); font-weight:600;">${item.kategori}</span>
+                    </div>
+                `;
+                div.onclick = () => { 
+                    selectedTicketId = item.id; 
+                    document.body.classList.add('mobile-chat-active');
+                    renderApp(); 
+                };
+                listPane.appendChild(div);
+            });
+
+            if(selectedTicketId) {
+                const current = globalData.find(i => i.id === selectedTicketId);
+                if(current) renderWorkspaceContent(current);
+            }
+        }
+
+        window.openLightbox = (url) => {
+            document.getElementById('lightboxImg').src = url;
+            document.getElementById('lightboxModal').style.display = 'flex';
+        };
+
+        function renderWorkspaceContent(item) {
+            let chatsHtml = (item.chats || []).map(c => {
+                let isAuto = c.isAutoReply || c.sender.includes('Auto-Reply') || c.sender.includes('System');
+                let cardClass = '';
+                
+                if (isAuto) {
+                    let alignPos = (userRole === 'admin' || userRole === 'viewer') ? 'align-right' : 'align-left';
+                    cardClass = `auto-reply-msg ${alignPos}`;
+                } else if (c.sender === currentUser) {
+                    cardClass = 'outgoing-msg';
+                } else {
+                    cardClass = 'incoming-msg';
+                }
+
+                return `
+                    <div class="chat-card ${cardClass}">
+                        <div class="chat-card-header">
+                            <span><b><i class="${isAuto ? 'fa-solid fa-robot' : 'fa-solid fa-user'}"></i> ${c.sender}</b></span>
+                            <span style="opacity:0.8;">${c.time}</span>
+                        </div>
+                        <div class="chat-card-body" style="white-space: pre-wrap;">${c.voiceUrl ? `<audio controls style="max-width:200px; height:32px;"><source src="${c.voiceUrl}" type="audio/webm"></audio>` : c.text}</div>
+                    </div>
+                `;
+            }).join('');
+
+            let attachHtml = '';
+            if(item.attachments && item.attachments.length > 0) {
+                attachHtml += '<div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">';
+                item.attachments.forEach(img => attachHtml += `<img src="${img}" onclick="openLightbox('${img}')" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid var(--border); cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">`);
+                attachHtml += '</div>';
+            }
+
+            let userActionButtons = '';
+            if (userRole === 'user' && item.pelapor && item.pelapor.toLowerCase().trim() === currentUser.toLowerCase().trim() && item.status !== 'Selesai') {
+                const safeItemStr = encodeURIComponent(JSON.stringify(item));
+                userActionButtons = `
+                    <div style="margin-top:8px; display:flex; gap:6px;">
+                        <button onclick="openEditModal(JSON.parse(decodeURIComponent('${safeItemStr}')))" style="background:var(--pane-bg); color:var(--text); border:1px solid var(--border); padding:3px 8px; border-radius:6px; font-size:0.7rem; cursor:pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--primary)'; this.style.color='#fff'" onmouseout="this.style.background='var(--pane-bg)'; this.style.color='var(--text)'"><i class="fa-solid fa-pen"></i> Edit</button>
+                        <button onclick="deleteTicket('${item.id}')" style="background:rgba(239, 68, 68, 0.1); color:#dc2626; border:1px solid rgba(239, 68, 68, 0.3); padding:3px 8px; border-radius:6px; font-size:0.7rem; cursor:pointer; transition: all 0.2s;" onmouseover="this.style.background='#dc2626'; this.style.color='#fff'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.color='#dc2626'"><i class="fa-solid fa-trash"></i> Hapus</button>
+                    </div>
+                `;
+            }
+
+            let solusiHtml = item.solusi !== '-' ? `
+                <div class="chat-card incoming-msg" style="background:rgba(22, 163, 74, 0.08); border:1px solid rgba(22, 163, 74, 0.3); width:100%; align-self:center;">
+                    <div class="chat-card-header" style="color:#16a34a;"><span><b><i class="fa-solid fa-circle-check"></i> Solusi Teknisi</b></span><span>Selesai</span></div>
+                    <div class="chat-card-body" style="color:var(--text);">${item.solusi}</div>
+                </div>
+            ` : '';
+
+            let logsHtml = (item.logs || []).map(l => `<div><i class="fa-solid fa-clock-rotate-left"></i> [${l.time}] ${l.text}</div>`).join('');
+
+            let replyBoxHtml = `
+                <div class="reply-box">
+                    <div id="emojiPickerPopup">
+                        <span class="emoji-item" onclick="insertEmoji('😊')">😊</span>
+                        <span class="emoji-item" onclick="insertEmoji('👍')">👍</span>
+                        <span class="emoji-item" onclick="insertEmoji('🙏')">🙏</span>
+                        <span class="emoji-item" onclick="insertEmoji('🔥')">🔥</span>
+                        <span class="emoji-item" onclick="insertEmoji('💻')">💻</span>
+                        <span class="emoji-item" onclick="insertEmoji('✅')">✅</span>
+                    </div>
+                    <button class="btn-icon" style="background:var(--pane-bg); color:var(--text); border:1px solid var(--border); border-radius:50%; width:38px; height:38px;" onclick="toggleEmojiPicker()"><i class="fa-solid fa-face-smile"></i></button>
+                    <input type="text" class="reply-input" id="chatInputText" placeholder="Ketik pesan..." oninput="sendTypingStatus('${item.id}')" onkeypress="handleChatEnter(event, '${item.id}')">
+                    <button class="btn-icon" id="btnRecordVoice" style="background:var(--pane-bg); color:var(--text); border:1px solid var(--border); border-radius:50%; width:38px; height:38px;" onclick="toggleVoiceRecording('${item.id}')" title="Rekam Voice Note"><i class="fa-solid fa-microphone"></i></button>
+                    <button class="btn-primary" style="background:var(--primary); color:#fff; border:none; width:40px; height:40px; border-radius:50%; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow: 0 4px 10px rgba(79,70,229,0.3); transition: all 0.25s ease;" onmouseover="this.style.transform='scale(1.1) rotate(-10deg)'; this.style.boxShadow='0 6px 16px var(--glow-color)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 10px rgba(79,70,229,0.3)'" onclick="sendChat('${item.id}')"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            `;
+
+            const workspace = document.getElementById('workspaceDetail');
+            if(!workspace) return;
+            workspace.style.display = 'flex';
+            workspace.innerHTML = `
+                <div class="workspace-header">
+                    <div class="workspace-title" style="width:100%;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <h2>${item.judul}</h2>
+                            <button onclick="backToTicketList()" class="btn-primary" style="background:var(--pane-bg); color:var(--text); border:1px solid var(--border); padding:4px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition: all 0.2s;" id="btnBackMobile" onmouseover="this.style.background='var(--card)'" onmouseout="this.style.background='var(--pane-bg)'"><i class="fa-solid fa-arrow-left"></i>&nbsp;Kembali</button>
+                        </div>
+                        <div class="workspace-sub">
+                            <span><i class="fa-solid fa-user"></i> ${item.pelapor}</span>
+                            <span><i class="fa-solid fa-tag"></i> ${item.kategori}</span>
+                            <span><i class="fa-solid fa-shield-halved"></i> <b>${item.status}</b></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-container" id="chatScrollArea">
+                    <div class="chat-card ${userRole === 'user' ? 'outgoing-msg' : 'incoming-msg'}">
+                        <div class="chat-card-header"><span><b>${item.pelapor}</b></span><span style="opacity:0.8;">${item.waktu}</span></div>
+                        <div class="chat-card-body">${item.deskripsi}</div>
+                        ${attachHtml}
+                        ${userActionButtons}
+                    </div>
+                    ${chatsHtml}
+                    ${solusiHtml}
+                </div>
+                <div class="audit-trail-box">
+                    <div style="font-weight:600; margin-bottom:2px;"><i class="fa-solid fa-list-check"></i> Audit Trail:</div>
+                    ${logsHtml}
+                </div>
+                <div class="typing-indicator" id="typingIndicator"></div>
+                ${replyBoxHtml}
+            `;
+
+            const chatArea = document.getElementById('chatScrollArea');
+            if(chatArea) chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        window.backToTicketList = () => {
+            selectedTicketId = null;
+            document.body.classList.remove('mobile-chat-active');
+            renderApp();
+        };
+
+        window.toggleEmojiPicker = () => document.getElementById('emojiPickerPopup').classList.toggle('show');
+        window.insertEmoji = (emoji) => {
+            const input = document.getElementById('chatInputText');
+            if(input) { input.value += emoji; input.focus(); }
+            document.getElementById('emojiPickerPopup').classList.remove('show');
+        };
+
+        let mediaRecorder = null, audioChunks = [], isRecording = false;
+        let recordingInterval = null, recordingSeconds = 0;
+
+        window.toggleVoiceRecording = async (ticketId) => {
+            const micBtn = document.getElementById('btnRecordVoice');
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                    mediaRecorder.onstop = () => {
+                        clearInterval(recordingInterval);
+                        const reader = new FileReader();
+                        reader.readAsDataURL(new Blob(audioChunks, { type: 'audio/webm' }));
+                        reader.onloadend = () => sendVoiceChat(ticketId, reader.result);
+                    };
+                    mediaRecorder.start(); 
+                    isRecording = true;
+                    recordingSeconds = 0;
+
+                    micBtn.style.background = "#dc2626";
+                    micBtn.style.color = "#fff";
+                    micBtn.innerHTML = `<span id="recTimer" style="font-size: 0.65rem; font-weight: bold;">0:00</span>`;
+                    
+                    recordingInterval = setInterval(() => {
+                        recordingSeconds++;
+                        let mins = Math.floor(recordingSeconds / 60);
+                        let secs = recordingSeconds % 60;
+                        let timerFormatted = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                        const timerEl = document.getElementById('recTimer');
+                        if(timerEl) timerEl.textContent = timerFormatted;
+                    }, 1000);
+
+                    showToast('Merekam voice note...');
+                } catch(e) { showToast('Gagal akses mic!'); }
+            } else {
+                if(mediaRecorder) mediaRecorder.stop();
+                isRecording = false;
+                if(micBtn) {
+                    micBtn.style.background = "var(--pane-bg)";
+                    micBtn.style.color = "var(--text)";
+                    micBtn.innerHTML = `<i class="fa-solid fa-microphone"></i>`;
+                }
+            }
+        };
+
+        function sendVoiceChat(id, voiceUrl) {
+            push(ref(db, `helpdesk_pro_clock/${id}/chats`), { 
+                sender: currentUser, 
+                voiceUrl: voiceUrl, 
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+            }).then(() => showToast('Voice note terkirim!'));
+        }
+
+        window.sendTypingStatus = (id) => {
+            set(ref(db, 'helpdesk_typing_status/' + id), currentUser);
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => set(ref(db, 'helpdesk_typing_status/' + id), ""), 1200);
+        };
+
+        window.sendChat = (id) => {
+            const inputEl = document.getElementById('chatInputText');
+            const txt = inputEl.value.trim();
+            if(!txt) return;
+
+            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            push(ref(db, `helpdesk_pro_clock/${id}/chats`), { 
+                sender: currentUser, 
+                text: txt, 
+                time: timeNow 
+            }).then(() => {
+                set(ref(db, 'helpdesk_typing_status/' + id), "");
+                inputEl.value = '';
+
+                if (userRole === 'user') {
+                    setTimeout(() => {
+                        triggerAutoReplyForChat(id);
+                    }, 800);
+                }
+            });
+        };
+
+        function triggerAutoReplyForChat(id) {
+            const target = globalData.find(i => i.id === id);
+            if (!target) return;
+
+            let chats = target.chats || [];
+
+            const hasAdminReplied = chats.some(c => 
+                c.sender !== currentUser && 
+                !c.isAutoReply && 
+                !c.sender.includes('Auto-Reply') && 
+                !c.sender.includes('System')
+            );
+
+            if (hasAdminReplied) {
+                return;
+            }
+
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const currentMinutes = hours * 60 + minutes;
+            const startBreak = 12 * 60;      
+            const endBreak = 13 * 60 + 30;   
+
+            let autoReplyMsgText = "";
+
+            if (currentMinutes >= startBreak && currentMinutes <= endBreak) {
+                autoReplyMsgText = `🤖 [SISTEM AUTO-REPLY]\n----------------------------------------\nPesan Anda telah diterima. Saat ini Tim Teknisi IT sedang dalam jam istirahat (12.00 - 13.30). Pesan Anda akan langsung dibalas setelah jam istirahat berakhir. Mohon ditunggu ya! 🙏`;
+            } else {
+                autoReplyMsgText = `🤖 [SISTEM AUTO-REPLY]\n----------------------------------------\nPesan Anda telah diterima. Tim IT Helpdesk akan segera memberikan tanggapan balasan. Mohon ditunggu!`;
+            }
+
+            push(ref(db, `helpdesk_pro_clock/${id}/chats`), {
+                sender: 'System / Auto-Reply',
+                text: autoReplyMsgText,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isAutoReply: true
+            });
+        }
+
+        window.handleChatEnter = (e, id) => { if(e.key === 'Enter') { e.preventDefault(); sendChat(id); } };
+        document.getElementById('searchKeyword').addEventListener('input', renderApp);
+        document.getElementById('btnOpenAnnouncementModal').addEventListener('click', () => {
+            document.getElementById('announcementInput').value = latestAnnouncementText;
+            document.getElementById('announcementModal').style.display = 'flex';
+        });
+
+        document.getElementById('btnExportExcel').addEventListener('click', () => {
+            if(globalData.length === 0) { showToast('Tidak ada data'); return; }
+            let csv = "Waktu,Cabang,Pelapor,NoHP,Email,Divisi,Ruangan,Kategori,Berulang,Prioritas,Judul,Deskripsi,Catatan,Status,Teknisi,Solusi\n";
+            globalData.forEach(t => csv += `"${t.waktu}","${t.cabang || ''}","${t.pelapor}","${t.noHp || ''}","${t.email || ''}","${t.divisi || ''}","${t.ruangan || ''}","${t.kategori}","${t.berulang || ''}","${t.prioritas}","${t.judul}","${t.deskripsi}","${t.catatan || ''}","${t.status}","${t.teknisi}","${t.solusi}"\n`);
+            const link = document.createElement("a");
+            link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+            link.download = `Helpdesk_Report.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            showToast('Export Berhasil');
+        });
+    </script>
+</body>
+</html>
